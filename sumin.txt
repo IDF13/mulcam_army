@@ -1,8 +1,0 @@
-test1
-test2
-test3
-test4
-
-
-git config --global user.email "wsum0411@google.com"
-git config --global user.name "SUMIN-WEE"
