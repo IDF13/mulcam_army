@@ -12,3 +12,8 @@ print(web_ranking[1].get_text())
 website_ranking = [web_ranking_element.get_text() for web_ranking_element in web_ranking[1:]]
 
 print(website_ranking[:4])
+
+import pandas as pd
+website_ranking_dict = {'website':website_ranking}
+df = pd.DataFrame(website_ranking_dict, columns=['website'], index=range(1,len(website_ranking)+1))
+df[0:6]
