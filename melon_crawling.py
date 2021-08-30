@@ -28,7 +28,7 @@ for i in chart_list:
 
 
 import csv
-with open('melon100.csv', 'w',encoding = 'utf-8', newline='') as f:
+with open('melon100.csv', 'w',encoding = 'utf-8-sig', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(['순위', '곡명','가수'])
     writer.writerow(melon_list)
