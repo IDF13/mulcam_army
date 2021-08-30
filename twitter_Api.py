@@ -15,7 +15,7 @@ twitter_api = twitter.Api(consumer_key=consumer_key,
 
 
 # 검색하기 GetSearch()
-query = "내이름불러주면"
+query = "내이름"
 statuses = twitter_api.GetSearch(term=query, count=100)
 
 for status in statuses:
