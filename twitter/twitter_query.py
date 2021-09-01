@@ -2,6 +2,7 @@ from numpy.core.numeric import full
 import requests
 import json 
 import pandas as pd
+import time
 
 import requests
 import json
@@ -28,6 +29,7 @@ def getTweetquery(query):
         print(i)
         print("")
         
+
         params={                                            ## 파라미터 같은 경우에는 그냥 정수 형태 가능 
                 'include_profile_interstitial_type' : 1
                 ,'include_blocking' : 1
@@ -69,19 +71,24 @@ def getTweetquery(query):
         
         for tweet in data['globalObjects']['tweets']:               ## 딕셔너리 형태 for문 돌리려면 in 앞에 key값 넣기
             fulltext = data['globalObjects']['tweets'][tweet]['full_text']
-            # print(fulltext)
-            
+            print(fulltext)
+        
+        with open(f'twitter_{query}.csv', "a", encoding='utf-8') as f:
+            f.write(f'{i+1} 번 째 트윗'+'\n'+fulltext+'\n')
+
+        
             
         if cursor=='':
             cursor = data['timeline']['instructions'][0]['addEntries']['entries'][-1]['content']['operation']['cursor']['value']
         else:
             cursor = data['timeline']['instructions'][-1]['replaceEntry']['entry']['content']['operation']['cursor']['value']
 
+        time.sleep(5)
 
- 
+    
     print("완료 !")
 
 
 
-getTweetquery('셀럽알람')
+getTweetquery('BTS')
 
