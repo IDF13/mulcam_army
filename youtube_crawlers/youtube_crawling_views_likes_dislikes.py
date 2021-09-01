@@ -95,3 +95,4 @@ table_2 = pd.DataFrame([title, views, likes, dislikes, comments, url]).T
 table_2.columns = ['제목', '조회수', '좋아요', '싫어요', '댓글수', 'url']
 
 table_2.to_csv(f'youtube_{q}_views_likes_dislikes.csv')
+
