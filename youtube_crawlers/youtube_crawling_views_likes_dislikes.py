@@ -1,97 +1,108 @@
-import re
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from oauth2client.tools import argparser
 import pandas as pd
-# https://yobro.tistory.com/190
+from googleapiclient.discovery import build
 
-# API Key
-key = 'AIzaSyDO7dPJcu4TqdRXu3kvz4KIZpGtVPxeYoo'
-api_service = 'youtube'
-api_ver = 'v3'
-url_format = 'https://www.youtube.com/watch?v='
-
-youtube = build(api_service, api_ver, developerKey=key)
-q = 'aespa'
-search_response = youtube.search().list(
-    # q = 유튜브 검색어
-    q=q,
-    order='relevance',
-    part='snippet',
-    maxResults=10
-).execute()
-
-channel_id = search_response['items'][0]['id']['channelId']
-
-playlists = youtube.playlists().list(
-    channelId=channel_id,
-    part='snippet',
-    maxResults=20
-).execute()
-
-ids = []
-titles = []
-for i in playlists['items']:
-    ids.append(i['id'])
-    titles.append(i['snippet']['title'])
-
-df = pd.DataFrame([ids, titles]).transpose()
-df.columns = ['플레이리스트_ID', '제목']
-
-playlist_videos = youtube.playlistItems().list(
-    playlistId=df['플레이리스트_ID'][0],
-    part='snippet', maxResults=50
-)
-list_response = playlist_videos.execute()
-# print(list_response)
-
-video_names = []
-video_ids = []
-date = []
-url = []
-
-for v in list_response['items']:
-    video_names.append(v['snippet']['title'])
-    video_ids.append(v['snippet']['resourceId']['videoId'])
-    date.append(v['snippet']['publishedAt'])
-    url.append(url_format+v['snippet']['resourceId']['videoId'])
-
-table = pd.DataFrame([date, video_names, video_ids, url]).transpose()
-table.columns = ['날짜', '영상제목', 'ID', 'url']
+# API Key (일일 할당량 있음)
+DEVELOPER_KEY = "AIzaSyDO7dPJcu4TqdRXu3kvz4KIZpGtVPxeYoo"
+YOUTUBE_API_SERVICE_NAME = "youtube"
+YOUTUBE_API_VERSION = "v3"
 
 
-category_id = []
-views = []
-likes = []
-dislikes = []
-comments = []
-mins = []
-seconds = []
-title = []
+def youtube_search(options, q):
+    youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+                    developerKey=DEVELOPER_KEY)
 
-for u in range(len(table)):
-    request = youtube.videos().list(
-        part='snippet,contentDetails,statistics', id=table['ID'][u]
-    )
+    search_response = youtube.search().list(
+        # q=options.q,
+        q=q,
+        order='relevance',
+        part="id,snippet",
+        maxResults=10
+    ).execute()
 
-    response = request.execute()
+    videos = []
+    video_ids = []
+    channels = []
+    playlists = []
 
-    if response['items'] == []:
-        ids.append('-')
-        category_id.append('-')
-        views.append('-')
-        likes.append('-')
-        dislikes.append('-')
-        comments.append('-')
-    else:
-        title.append(response['items'][0]['snippet']['title'])
-        category_id.append(response['items'][0]['snippet']['categoryId'])
-        views.append(response['items'][0]['statistics']['viewCount'])
-        likes.append(response['items'][0]['statistics']['likeCount'])
-        dislikes.append(response['items'][0]['statistics']['dislikeCount'])
-        comments.append(response['items'][0]['statistics']['commentCount'])
+    # Add each result to the appropriate list, and then display the lists of
+    # matching videos, channels, and playlists.
+    for search_result in search_response.get("items", []):
+        if search_result["id"]["kind"] == "youtube#video":
+            videos.append("%s (%s)" % (search_result["snippet"]["title"],
+                                       search_result["id"]["videoId"]))
+            video_ids.append(search_result["id"]["videoId"])
+        elif search_result["id"]["kind"] == "youtube#channel":
+            channels.append("%s (%s)" % (search_result["snippet"]["title"],
+                                         search_result["id"]["channelId"]))
+        elif search_result["id"]["kind"] == "youtube#playlist":
+            playlists.append("%s (%s)" % (search_result["snippet"]["title"],
+                                          search_result["id"]["playlistId"]))
 
-table_2 = pd.DataFrame([title, views, likes, dislikes, comments, url]).T
-table_2.columns = ['제목', '조회수', '좋아요', '싫어요', '댓글수', 'url']
+    print("----- Videos:------\n", "\n".join(videos), "\n")
+    print("----- Channels:------\n", "\n".join(channels), "\n")
+    print("----- Playlists:-------\n", "\n".join(playlists), "\n")
 
-table_2.to_csv(f'youtube_{q}_views_likes_dislikes.csv')
+    print('*'*80)
+
+    # print(search_result['id']['kind'])
+    # print(search_result['id'])
+    # print(video_ids)
+
+    ##
+
+    category_id = []
+    views = []
+    likes = []
+    dislikes = []
+    comments = []
+    title = []
+
+    for i in range(len(video_ids)):
+        request = youtube.videos().list(
+            part='snippet,contentDetails,statistics',
+            # id=search_result['id']['videoId'],  # id='dyRsYk0LyA8'
+            id=video_ids[i]
+        )
+
+        response = request.execute()
+        ###
+        # print(' : ', response['items'][0]['statistics'])
+
+        if response['items'] == []:
+            # video_ids.append('-')
+            category_id.append('-')
+            views.append('-')
+            likes.append('-')
+            dislikes.append('-')
+            comments.append('-')
+        else:
+            title.append(response['items'][0]['snippet']['title'])
+            category_id.append(response['items'][0]['snippet']['categoryId'])
+            views.append(response['items'][0]['statistics']['viewCount'])
+            likes.append(response['items'][0]['statistics']['likeCount'])
+            dislikes.append(response['items'][0]['statistics']['dislikeCount'])
+            comments.append(response['items'][0]['statistics']['commentCount'])
+            # video_ids.append(search_result["id"]["videoId"])
+
+    table = pd.DataFrame(
+        [title, views, likes, dislikes, comments, video_ids]).T
+    table.columns = ['제목', '조회수', '좋아요', '싫어요', '댓글수', '영상아이디']
+
+    print('++++++++ table ++++++++++')
+    print(table)
+    print()
+
+    table.to_csv(f'youtube.csv')
+    return table
+##
+
+
+query_list = [
+    'bts',
+    'aespa',
+    'blackpink'
+]
+# for idol in query_list:
+#     youtube_search(options=None, q=idol)
+
+youtube_search(options=None, q='blackpink')
