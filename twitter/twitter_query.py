@@ -1,3 +1,6 @@
+'''
+made by ASG
+'''
 from numpy.core.numeric import full
 import requests
 import json 
