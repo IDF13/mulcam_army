@@ -7,7 +7,7 @@ from oauth2client.tools import argparser
 from requests.api import request
 import pandas as pd
 
-DEVELOPER_KEY = "AIzaSyDO7dPJcu4TqdRXu3kvz4KIZpGtVPxeYoo"
+DEVELOPER_KEY = "AIzaSyBairE2KSXeJp6jNHw6NCBiip8YvzLGsDA"
 YOUTUBE_API_SERVICE_NAME="youtube"
 YOUTUBE_API_VERSION="v3"
 
@@ -45,6 +45,7 @@ def getthumbnails_high(query):
 
 
 
+
 def playlists(query):
         
     playlists = youtube.playlists().list(
@@ -72,8 +73,6 @@ def playlists(query):
     # print(df)
     return df
     
-# print(playlists('aespa'))
-
 
 
 
@@ -103,20 +102,14 @@ def getvideolist(query):
         
         return vdf
 
-# print(getvideolist('aespa'))
+ 
 
-        
-
-
-
-### 넥스트 레벨 재생목록 중 동영상들 stats
+###  재생목록 중 동영상들 stats
 
 import re
 
 def getstatistics(query):
         
-
-            
     ids=[]
     category_id=[]
     views=[]
@@ -158,4 +151,3 @@ def getstatistics(query):
     print(statistics_df)
     return statistics_df
 
-getstatistics('aespa')
