@@ -146,6 +146,3 @@ with open(f'youtube_crawling_댓글_id_{youtube_id}.csv', "w") as file1:
         writes.writerow(item.values())
 
     writes.writerows(download_comments())
-
-
-    writes.writerows(download_comments())
