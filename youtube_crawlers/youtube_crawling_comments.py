@@ -144,5 +144,4 @@ with open(f'youtube_crawling_댓글_id_{youtube_id}.csv', "w") as file1:
     writes = csv.writer(file1, delimiter=',', quoting=csv.QUOTE_ALL)
     for item in download_comments():
         writes.writerow(item.values())
-
     writes.writerows(download_comments())
