@@ -1,3 +1,6 @@
+'''
+made by ASG
+'''
 import wikipediaapi
 
 def wiki_ko(query):
