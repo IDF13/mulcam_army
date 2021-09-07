@@ -13,9 +13,9 @@ YOUTUBE_API_VERSION="v3"
 
 youtube = build(YOUTUBE_API_SERVICE_NAME,YOUTUBE_API_VERSION,developerKey=DEVELOPER_KEY)
 
-##에스파 Playlist Id값 구하기
+## Playlist Id값 구하기
 
-# ###에스파 List   중 넥스트레벨 재생목록  데이터 / 아이디
+# ### List   중 넥스트레벨 재생목록  데이터 / 아이디
 # 모든 list 안의 동영상 date , title, id(50개까지)
 
 def getsearch_response(query):
