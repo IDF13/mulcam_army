@@ -58,3 +58,4 @@ def get_clean_text(df):
         text1 = " ".join(text)
             
     return text1
+    
