@@ -158,7 +158,7 @@ def video_comment_crawling():
 
 
 if __name__ == '__main__':
-    # video_url_crawling()  # 키워드에 대한 영상들의 url 저장
+    video_url_crawling()  # 키워드에 대한 영상들의 url 저장
     video_comment_crawling()  # url에 접속하여 댓글들 가져옴
 
 end = time.time()
