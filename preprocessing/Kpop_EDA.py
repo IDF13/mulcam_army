@@ -50,15 +50,10 @@ train.head()
 
 
 content=train['content']
-
-
-# In[8]:
-
-
 train['lang']=detect(content[0])
 
 
-# In[9]:
+# In[8]:
 
 
 try:
@@ -70,37 +65,37 @@ except:
     pass
 
 
-# In[10]:
+# In[9]:
 
 
 train.head()
 
 
-# In[11]:
+# In[10]:
 
 
 train.info()
 
 
-# In[12]:
+# In[11]:
 
 
 ##  언어 분류
 
 
-# In[13]:
+# In[12]:
 
 
 train['lang'].unique()
 
 
-# In[14]:
+# In[13]:
 
 
 train['lang'].value_counts()
 
 
-# In[15]:
+# In[14]:
 
 
 en=['en']
@@ -108,84 +103,80 @@ eng = train.loc[train['lang'].isin(en)]
 eng
 
 
-# In[16]:
+# In[15]:
 
 
 kor = re.compile(r'[ㄱ-ㅣ가-힣]')
 
 
+# In[16]:
+
+
+#content내에 존재하는 한글의 길이
+#한글댓글인데 영어로 분류된 케이스를 수정하기 위한 컬럼 작성
+train['len']=len(re.findall(kor, train['content'][0]))
+
+for i in range(len(content)):
+    train.loc[i,'len']=len(re.findall(kor, train.loc[i,'content']))
+
+train.loc[train['len'] !=0, 'lang'] = 'ko'
+
+
 # In[17]:
 
 
-train['len']=len(re.findall(kor, train['content'][0]))
+#문장 길이 측정
+train['long']=train['content'].apply(len) 
 
 
 # In[18]:
 
 
-for i in range(len(content)):
-    train.loc[i,'len']=len(re.findall(kor, train.loc[i,'content']))
+train
 
 
 # In[19]:
 
 
-train['long']=train['content'].apply(len)
+train.info()
 
 
 # In[20]:
 
 
-train.loc[train['len'] !=0, 'lang'] = 'ko'
-train
+train['lang'].value_counts()
 
 
 # In[21]:
 
 
-train.info()
-
-
-# In[22]:
-
-
-train['lang'].value_counts()
-
-
-# In[23]:
-
-
 ## 전처리 시작
 
 
-# In[24]:
+# In[22]:
 
 
 ### 한국어 문장 분리
 get_ipython().system('pip install kss')
 
 
-# In[25]:
+# In[23]:
 
 
 import kss
 
 
-# In[26]:
+# In[24]:
 
 
 punct = "/-'?!.,#$%\'()*+-/:;<=>@[\\]^_`{|}~" + '""“”’' + '∞θ÷α•à−β∅³π‘₹´°£€\×™√²—–&'
-
-
-# In[27]:
-
-
 punct_mapping = {"‘": "'", "₹": "e", "´": "'", "°": "", "€": "e", "™": "tm", "√": " sqrt ", "×": "x", "²": "2", "—": "-", "–": "-", "’": "'", "_": "-", "`": "'", '“': '"', '”': '"', '“': '"', "£": "e", '∞': 'infinity', 'θ': 'theta', '÷': '/', 'α': 'alpha', '•': '.', 'à': 'a', '−': '-', 'β': 'beta', '∅': '', '³': '3', 'π': 'pi', }
 
 
-# In[28]:
+# In[25]:
 
 
+#이모티콘 제거
 def remove_emoji(string):
     emoji_pattern = re.compile("["
                            u"\U0001F600-\U0001F64F"  # emoticons
@@ -207,9 +198,10 @@ emoji_pattern = re.compile(
     "+", flags=re.UNICODE)
 
 
-# In[29]:
+# In[26]:
 
 
+#텍스트 정제
 def clean_punc(text, punct, mapping):
     for p in mapping:
         text = text.replace(p, mapping[p])
@@ -224,9 +216,10 @@ def clean_punc(text, punct, mapping):
     return text.strip()
 
 
-# In[30]:
+# In[27]:
 
 
+#텍스트 정제
 def clean_text(texts):
     corpus = []
     for i in range(0, len(texts)):
@@ -242,25 +235,25 @@ def clean_text(texts):
     return corpus
 
 
-# In[31]:
+# In[28]:
 
 
 train['content']
 
 
-# In[32]:
+# In[29]:
 
 
 for i in range(len(content)):
         train.loc[i,'content']=remove_emoji(content[i])
         train.loc[i,'content']=clean_punc(content[i], punct, punct_mapping)
         train['content'][i]=clean_text(content[i])
-        train['content'][i]=word_tokenize(content[i])
+        train['content'][i]=word_tokenize(content[i])        # 토크나이징
         
 train
 
 
-# In[33]:
+# In[30]:
 
 
 # for i in range(len(content)):
@@ -271,13 +264,19 @@ train
 #     train['content'][i]=word_tokenize(content[i])
 
 
-# In[34]:
+# In[31]:
 
 
 train['content']
 
 
-# In[35]:
+# In[32]:
+
+
+#띄어쓰기
+
+
+# In[33]:
 
 
 ## 맞춤법 검사기
@@ -285,7 +284,7 @@ train['content']
 # !pip install git+https://github.com/ssut/py-hanspell.git
 
 
-# In[36]:
+# In[34]:
 
 
 # from hanspell import spell_checker
@@ -314,21 +313,27 @@ train['content']
 #     print(spell.candidates(word))
 
 
-# In[37]:
+# In[35]:
 
 
 # for i in range(len(content)):
 #     train.loc[i,'content']=spell.correction(content[i])
 
 
-# In[ ]:
+# In[36]:
 
 
+#불용어
 
 
-
-# In[ ]:
-
+# In[37]:
 
 
+#정수 인코딩
+
+
+# In[38]:
+
+
+#형태소 분리
 
