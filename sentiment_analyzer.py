@@ -1,14 +1,16 @@
 import pandas as pd
 from textblob import TextBlob
-from IPython.display import display, HTML
 
 # 아래 두 줄만 바꿔주시면 됩니다!
 df = pd.read_csv(
     '/Users/sollee/Desktop/mulcam_army/youtube_dataset/comments/comments_TWICE.csv')
 texts = df.iloc[:, 0]
+likes = df.iloc[:, 1]
 
 clean_tweets = []
 scores = []
+likes_list = []
+emotions = []
 
 
 def sentiment_analyzer():
@@ -18,8 +20,15 @@ def sentiment_analyzer():
         score = round(blob.sentiment.polarity, 2)
         scores.append(score)
 
-    table = pd.DataFrame([clean_tweets, scores]).T
-    table.columns = ['original texts', 'sentiment score']
+    for like in likes:
+        likes_list.append(like)
+
+    for score, like in zip(scores, likes_list):
+        emotions.append(score*like)
+
+    table = pd.DataFrame(
+        [clean_tweets, likes_list, scores, emotions]).T
+    table.columns = ['original texts', '좋아요', '긍정점수', '공감지수']
 
     print(table)
 
