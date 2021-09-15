@@ -2,6 +2,9 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup as bs
 import csv
+import schedule
+import time
+
 
 def get_melon_chart():
     #실시간 차트 기준
@@ -81,4 +84,4 @@ def get_melon_chart():
     df.to_csv('melon100.csv')
     
 
-get_melon_chart()
+schedule.every().day.at("09:00").do(get_melon_chart)
