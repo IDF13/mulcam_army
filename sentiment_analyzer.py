@@ -1,26 +1,33 @@
 import pandas as pd
 from textblob import TextBlob
+from IPython.display import display, HTML
 
 # 아래 두 줄만 바꿔주시면 됩니다!
 df = pd.read_csv(
-    '/Users/sollee/Desktop/mulcam_army/youtube_dataset/comments/comments_SUPER JUNIOR.csv')
+    '/Users/sollee/Desktop/mulcam_army/youtube_dataset/comments/comments_TWICE.csv')
 texts = df.iloc[:, 0]
 
 clean_tweets = []
 scores = []
 
-for tweet in texts:
-    clean_tweets.append(tweet)
-    blob = TextBlob(tweet)
-    score = round(blob.sentiment.polarity, 2)
-    scores.append(score)
 
-table = pd.DataFrame([clean_tweets, scores]).T
-table.columns = ['original texts', 'sentiment score']
+def sentiment_analyzer():
+    for tweet in texts:
+        clean_tweets.append(tweet)
+        blob = TextBlob(tweet)
+        score = round(blob.sentiment.polarity, 2)
+        scores.append(score)
 
-print(table)
+    table = pd.DataFrame([clean_tweets, scores]).T
+    table.columns = ['original texts', 'sentiment score']
 
-table.to_csv(f'/Users/sollee/Desktop/sentiment_analysis.csv')
+    print(table)
+
+    table.to_csv(f'/Users/sollee/Desktop/sentiment_analysis_TWICE.csv')
+    return table
+
+
+sentiment_analyzer()
 
 # 결과 예시:
 '''
