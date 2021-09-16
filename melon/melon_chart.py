@@ -89,5 +89,5 @@ def get_melon_chart():
     print(df)
     df.to_csv(f'{mm}월{dd}일{hh}시_melon100.csv')
     
-get_melon_chart()
+# get_melon_chart()
 schedule.every().day.at("09:00").do(get_melon_chart)
