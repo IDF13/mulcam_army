@@ -85,7 +85,11 @@ def get_genie_RTM():
         
     df=pd.DataFrame({'Rank': rank3, 'Title': title3,'Artist':artist3})
     # print(df)
-    df.to_csv(f'{mm,dd,hh}_genie.csv')
+    df.to_csv(f'{mm}월 {dd}일 {hh}시_genie.csv')
 
 
 schedule.every().day.at("09:00").do(get_genie_RTM)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)

@@ -91,3 +91,7 @@ def get_melon_chart():
     
 # get_melon_chart()
 schedule.every().day.at("09:00").do(get_melon_chart)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)

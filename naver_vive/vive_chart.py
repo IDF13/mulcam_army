@@ -73,7 +73,11 @@ def getvivechart():
 
         df=pd.DataFrame({'title': title_list, 'artist': artist_list2, 'album': album_list, 'genre':genre_list, 'img':img_list})
     
-    df.to_csv(f'{mm,dd,hh}_Vive100.csv')
+    df.to_csv(f'{mm}월{dd}일{hh}시_Vive100.csv')
 
 
 schedule.every().day.at("09:00").do(getvivechart)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
