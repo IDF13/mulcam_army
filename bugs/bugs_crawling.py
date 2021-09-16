@@ -38,7 +38,7 @@ def getbugschart():
     data = pd.DataFrame([ranking, title, artist])
     dataframe = data.transpose()
     dataframe.columns = ['순위', '제목', '가수']
-    dataframe.to_csv(f"{mm,dd,hh}_bugs_chart", encoding='CP949', index=False)
+    dataframe.to_csv(f"{mm}월{dd}일{hh}시_bugs_chart", encoding='CP949', index=False)
 
 
     return dataframe
@@ -46,3 +46,7 @@ def getbugschart():
 
 
 schedule.every().day.at("09:00").do(getbugschart)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
