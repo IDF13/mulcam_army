@@ -29,7 +29,7 @@ def main():
     data = pd.DataFrame([ranking, title, artist])
     dataframe = data.transpose()
     dataframe.columns = ['순위', '제목', '가수']
-    dataframe.to_csv("bugs_chart", encoding='CP949', index=False)
+    dataframe.to_csv("bugs_chart", encoding='utf-8-sig', index=False)
 
 
     return dataframe
