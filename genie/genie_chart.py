@@ -5,6 +5,9 @@ from builtins import print
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import schedule
+import time
+from datetime import datetime
 
 headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'}
 
@@ -45,14 +48,16 @@ def get_genie_daily(date):
     df.to_csv(f'{date}_genie.csv')
 
 
-# get_genie_daily(20210830)
-
 
 def get_genie_RTM():
 
     title3=[]
     artist3=[]
     rank3=[]
+
+    mm=datetime.today().month        # 현재 월 가져오기
+    dd=datetime.today().day        # 현재 일 가져오기
+    hh=datetime.today().hour        # 현재 시간 가져오기
 
     for i in range(5):
         #rtm=Y이면  ymd/hh 아무값이나 들어가도 상관없이 실시간 차트 불러옴
@@ -79,7 +84,8 @@ def get_genie_RTM():
         rank3.extend(rank_list)
         
     df=pd.DataFrame({'Rank': rank3, 'Title': title3,'Artist':artist3})
-    print(df)
-    df.to_csv(f'RTM_genie.csv')
+    # print(df)
+    df.to_csv(f'{mm,dd,hh}_genie.csv')
 
-get_genie_RTM()
+
+schedule.every().day.at("09:00").do(get_genie_RTM)
