@@ -84,7 +84,11 @@ def getFlochart():
         
 
 
-        df.to_csv(f'{mm,dd,hh}_Flo100.csv')
+        df.to_csv(f'{mm}월{dd}일{hh}시_Flo100.csv')
 
 # Every day at 09am getflochart() is called.
 schedule.every().day.at("09:00").do(getFlochart)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
