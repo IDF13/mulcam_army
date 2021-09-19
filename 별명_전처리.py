@@ -12,3 +12,37 @@ re.sub(regex,'',sample2)
 작은 거인, 초면갑, 하요정, 37초남, 인간내비, 완판남,
 보부상, 하폰지밥, 운깅이, 행복전도사, 하청순, 하애기,
 촉성운/하셍촉, 셍코리타, 용맹병아리, 막내가장, 셍스트, 뱉말지남, 도토리셍'''
+
+df = pd.read_excel('/content/drive/MyDrive/ML Deep/자연어처리/아티스트이름.xlsx')
+a = df['별명'].values
+len(a)
+
+nick_name = []
+for num, nick in enumerate(a):
+  regex = "\[*..\]"
+  t = re.sub(regex,'',nick)
+  df['별명'][num] = t
+  
+
+korName = df['korName'].values
+engName = df['engName'].values
+member = df['member'].values
+nick = df['별명'].values
+
+# dictionary1 = dict(zip(korName, member)) # 딕셔너리는 key값이 중복되면 안됨
+dictionary = dict(zip(member, nick))
+
+
+key_name = input('찾으시는 아티스트의 이름을 적으세요')
+b =[]
+for key, val in dictionary.items():
+  if key_name in val:
+    b.append(key)
+
+print("찾으시는 단어:",b)
+
+# 결과
+'''
+찾으시는 아티스트의 이름을 적으세요두부
+찾으시는 단어: ['온유', '시은', '윈터', '유용하', '준규', '다현']
+'''
