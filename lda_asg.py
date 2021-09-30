@@ -65,66 +65,6 @@ df.columns=['comment','like']
 
 df
 
-# temp=name['engName'][0]
-# temp1=name['engName'][1]
-
-
-# comment_file0 = f'comments_youtube_{temp}.csv'     #GOT7
-# df0 = pd.read_csv(path+comment_file0, encoding='utf-8', header=None)
-# df0
-# comment_file1 = f'comments_youtube_{temp1}.csv'     #GOT7
-# df1 = pd.read_csv(path+comment_file1, encoding='utf-8', header=None)
-# df1
-# frames=[df0,df1]
-# keys = [temp,temp1]
-# df = pd.concat(frames, ignore_index=True)
-# df.columns=['comment','like']
-# df
-
-# frames = [df1,df2,df3,df4,df5,df6,df7,df8,df9,df10]
-# keys = ['shinee','sf9','seventeen','red_velvet','purple_kiss','pentagon','park_jihoon','oneus','nuest','nct']
-
-# # df.loc['key_name']으로 데이터 프레임만 따로 뽑아낼 수 있다.
-# # df = pd.concat(frames,keys=keys,ignore_index=True)
-# df = pd.concat(frames, ignore_index=True)
-# df.columns=['comment','like']
-# df
-
-# """# 유튜브 크롤링 파일 로드"""
-
-# path = '/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/크롤링 한 자료/youtube/영상별 댓글/'
-
-# shinee = 'comments_youtube_SHINee.csv'
-# sf9 = 'comments_youtube_SF9.csv'
-# seventeen = 'comments_youtube_SEVENTEEN.csv'
-# red_velvet = 'comments_youtube_RED VELVET.csv'
-# purple_kiss = 'comments_youtube_PURPLE KISS.csv'
-# pentagon = 'comments_youtube_PENTAGON.csv'
-# park_jihoon = 'comments_youtube_PARK JIHOON.csv'
-# oneus = 'comments_youtube_ONEUS.csv'
-# nuest = "comments_youtube_NU'EST.csv"
-# nct = "comments_youtube_NCT.csv"
-
-# df1 = pd.read_csv(path+shinee, encoding='utf-8', header=None)
-# df2 = pd.read_csv(path+sf9, encoding='utf-8', header=None)
-# df3 = pd.read_csv(path+seventeen, encoding='utf-8', header=None)
-# df4 = pd.read_csv(path+red_velvet, encoding='utf-8', header=None)
-# df5 = pd.read_csv(path+purple_kiss, encoding='utf-8', header=None)
-# df6 = pd.read_csv(path+pentagon, encoding='utf-8', header=None)
-# df7 = pd.read_csv(path+park_jihoon, encoding='utf-8', header=None)
-# df8 = pd.read_csv(path+oneus, encoding='utf-8', header=None)
-# df9 = pd.read_csv(path+nuest, encoding='utf-8', header=None)
-# df10 = pd.read_csv(path+nct, encoding='utf-8', header=None)
-
-# frames = [df1,df2,df3,df4,df5,df6,df7,df8,df9,df10]
-# keys = ['shinee','sf9','seventeen','red_velvet','purple_kiss','pentagon','park_jihoon','oneus','nuest','nct']
-
-# # df.loc['key_name']으로 데이터 프레임만 따로 뽑아낼 수 있다.
-# # df = pd.concat(frames,keys=keys,ignore_index=True)
-# df = pd.concat(frames, ignore_index=True)
-# df.columns=['comment','like']
-# df
-
 """# 네트워크 오류 등으로 발생한 중복 입력 값 제거
 - 빈도 수 중복 방지
 - 대문자 소문자로 바꾸기
@@ -213,7 +153,6 @@ comment_result
 """# 언어별 분류 작업
 - 정확도가 높은 fasttext 모듈로 분류
 """
-
 !pip install fasttext
 
 import fasttext
@@ -242,6 +181,9 @@ for num, txt in enumerate(ty[0]):
   elif txt == "('__label__id',)":
     b = re.sub(txt,"id",txt)
     comment.append(b)
+  elif txt == "('__label__es',)":
+    b = re.sub(txt,"es",txt)
+    comment.append(b)
   else:
     b = re.sub(txt,"etc",txt)
     comment.append(b)
@@ -250,6 +192,10 @@ for num, txt in enumerate(ty[0]):
 comment[:10]
 comment = pd.DataFrame(comment)
 comment
+
+comment.value_counts()
+
+ty[0].value_counts()
 
 pd.set_option('max_columns',50)
 pd.set_option('max_rows',100)
@@ -265,7 +211,7 @@ data
 data_ko = pd.DataFrame([kor[:1] for kor in data.values if kor[2] == '(ko)'], columns=['comment'])
 data_en = pd.DataFrame([en[:1] for en in data.values if en[2] == '(en)'], columns=['comment'])
 
-data_ko.comment.values
+# data_ko.comment.values
 
 """## 영어 만"""
 
@@ -283,8 +229,6 @@ for i in data_en.comment.values:
   en.append(tokens)
 
 len(en)
-
-
 
 """### 영어 불용어 제거
 
@@ -317,6 +261,10 @@ res[:2]
 
 len(res)
 
+"""### 영어 형태소 분석 / 품사 태깅
+
+"""
+
 en_pos = []
 for i in range(len(res)):
     tokens_pos = nltk.pos_tag(res[i])
@@ -335,11 +283,17 @@ for i in range(len(en_pos)):
 
 en_NN[:10]
 
+"""### 단어(명사) 빈도 분석
+
+"""
+
 #9. 빈도분석
 from collections import Counter
 c = Counter(en_NN) # input type should be a list of words (or tokens)
 k = 10
 print(c.most_common(k)) # 빈도수 기준 상위 k개 단어 출력
+
+"""### wordcloud 생성"""
 
 #wordclound
 import wordcloud
@@ -357,7 +311,12 @@ plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis("off")
 plt.show()
 
-"""## 한글 만"""
+wordcloud.to_file('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/wordcloud.png')
+
+"""# 한글 만
+
+## 띄어쓰기 교정 안한 버전
+"""
 
 """# 텍스트 전처리 2차 작업"""
 
@@ -450,14 +409,15 @@ from soynlp.word import WordExtractor
 from soynlp.tokenizer import LTokenizer
 
 noun_extractor = LRNounExtractor_v2(verbose=True)
-nouns = noun_extractor.train_extract(kr)
-nouns
+nouns = noun_extractor.train_extract(kr,min_noun_score=0.3, min_noun_frequency=5)
 
-list(noun_extractor._compounds_components.items())[:5]
+nouns['아이돌']
+
+list(noun_extractor._compounds_components.items())[:10]
 
 noun_extractor.lrgraph.get_r('샤이니', topk=20)
 
-"""# Word Extraction
+"""### Word Extraction
 
 품사 판별 (Part of speech tagging)은 주어진 문장에 대하여 단어를 인식하고 각 단어의 품사를 판별하는 과정입니다. KoNLPy는 여러 종류의 품사 판별기를 파이썬 환경에서 이용할 수 있도록 도와줍니다.
 
@@ -613,13 +573,6 @@ lda = LatentDirichletAllocation(n_components = 10,
 
 X_topics = lda.fit_transform(bag)
 
-# 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (BoW 기반)
-n_top_word = 10
-feature_name = count.get_feature_names()
-for topic_idx, topic in enumerate(lda.components_):
-  print("토픽 %d:" % (topic_idx+1))
-  print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
-
 # LDA 사용 (tf-idf 기반)
 
 lda_tfidf = LatentDirichletAllocation(n_components = 10,
@@ -628,6 +581,15 @@ lda_tfidf = LatentDirichletAllocation(n_components = 10,
 
 X_topics = lda_tfidf.fit_transform(docs_soynlp)
 
+"""### 띄어쓰기 안한 토픽 모델 결과"""
+
+# 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (BoW 기반)
+n_top_word = 10
+feature_name = count.get_feature_names()
+for topic_idx, topic in enumerate(lda.components_):
+  print("토픽 %d:" % (topic_idx+1))
+  print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
+
 # 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (tf-idf 기반)
 n_top_word = 10
 feature_name = count.get_feature_names()
@@ -635,3 +597,230 @@ for topic_idx, topic in enumerate(lda_tfidf.components_):
   print("토픽 %d:" % (topic_idx+1))
   print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
 
+# https://github.com/lovit/soykeyword
+# https://github.com/lovit/soyspacing
+
+
+
+"""## 띄어쓰기 교정 한 버전
+
+한글 띄어쓰기
+Korean Space Error Corrector
+"""
+
+# 숫자제거 / 밑줄 제외한 특수문자 제거
+p = re.compile("[0-9]+")
+q = re.compile("\W+")
+r = re.compile('[^ ㄱ-ㅣ가-힣]+')
+
+kr2 = []
+
+for i in data_ko.comment.values:
+  tokens = re.sub(p," ",i)
+  tokens = re.sub(q," ",tokens)
+  tokens = re.sub(r," ", tokens)
+  kr2.append(tokens)
+
+kr2[:2]
+
+with open("/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/lda/kr2.txt", 'w') as f:
+    f.writelines(line)
+
+!pip install soyspacing
+
+from soyspacing.countbase import CountSpace
+
+corpus_fname = '/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/lda/kr2.txt'
+model = CountSpace()
+model.train(corpus_fname)
+
+model.save_model('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/lda/model', json_format=False)
+
+model = CountSpace()
+model.load_model('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/lda/model', json_format=False)
+
+verbose=False
+mc = 5  # min_count
+ft = 0.3 # force_abs_threshold
+nt =-0.3 # nonspace_threshold
+st = 0.3 # space_threshold
+
+# sent = '이건진짜좋은영화 라라랜드진짜좋은영화'
+
+# with parameters
+sent_corrected, tags = model.correct(
+    doc=sent,
+    verbose=verbose,
+    force_abs_threshold=ft,
+    nonspace_threshold=nt,
+    space_threshold=st,
+    min_count=mc)
+
+kr2_cor=[]
+# without parameters
+for i in range(len(kr2)):
+    sent_corrected, tags = model.correct(kr2[i])
+    kr2_cor.append(sent_corrected)
+
+kr2_cor[:2]
+
+"""---------------- 띄어쓰기 완료 ---------------------
+
+"""
+
+noun_extractor2 = LRNounExtractor_v2(verbose=True)
+nouns2 = noun_extractor2.train_extract(kr2_cor,min_noun_score=0.3, min_noun_frequency=5)
+
+nouns2['아이돌']
+
+list(noun_extractor2._compounds_components.items())[:10]
+
+noun_extractor2.lrgraph.get_r('샤이니', topk=20)
+
+# Word Extraction
+
+word_extractor2 = WordExtractor(min_frequency=5,
+    min_cohesion_forward=0.05, 
+    min_right_branching_entropy=0.001
+)
+word_extractor2.train(kr2_cor) # list of str or like
+words2 = word_extractor2.extract()
+len(words2)
+
+words2['샤이니']
+
+import math
+
+def word_score(score):
+    return (score.cohesion_forward * math.exp(score.right_branching_entropy))
+
+print('단어   (빈도수, cohesion, branching entropy)\n')
+for word, score in sorted(words2.items(), key=lambda x:word_score(x[1]), reverse=True)[:30]:
+    print('%s     (%d, %.3f, %.3f)' % (
+            word, 
+            score.leftside_frequency, 
+            score.cohesion_forward,
+            score.right_branching_entropy
+            )
+         )
+
+cohesion_scores2 = word_extractor2.all_cohesion_scores()
+cohesion_scores2['샤이니'] # (cohesion_forward, cohesion_backward)
+
+branching_entropy2 = word_extractor2.all_branching_entropy()
+branching_entropy2['샤이니'] # (left_branching_entropy, right_branching_entropy)
+
+accessor_variety2 = word_extractor2.all_accessor_variety()
+accessor_variety2['샤이니'] # (left_accessor_variety, right_accessor_variety)
+
+# 단어 토크나이징
+noun_extractor2 = LRNounExtractor_v2(verbose=True)
+
+# 말뭉치는 리스트값으로 입력(명사만 추출)
+nouns2 = noun_extractor2.train_extract(kr2_cor)
+
+word_extractor2 = WordExtractor(min_frequency=5,
+                               min_cohesion_forward=0.05,
+                               min_right_branching_entropy=0.001)
+word_extractor2.train(kr2_cor)
+
+# 명사, 단어 확률값만 활용하여 토크나이저 만들기
+cohesion_score2 = {word:score.cohesion_forward for word, score in words2.items()}
+
+noun_scores2 = {noun:score.score for noun, score in nouns2.items()}
+combined_scores2 = {noun:score + cohesion_score2.get(noun, 0)
+    for noun, score in noun_scores2.items()}
+combined_scores2.update(
+    {subword:cohesion for subword, cohesion in cohesion_score2.items()
+    if not (subword in combined_scores)}
+)
+
+tokenizer2 = LTokenizer(scores=combined_scores2)
+
+print(kr2_cor[0])
+print(tokenizer2.tokenize(kr2_cor[0]))
+
+"""# 빈도수 계산을 위한 텍스트 데이터 벡터화
+ - BoW 단어를 특성 벡터로 변환
+ - TF-IDF 를 사용하여 단어 적합성 평가
+"""
+
+# BoW 모델로 벡터화
+from sklearn.feature_extraction.text import CountVectorizer
+
+count2 = CountVectorizer(tokenizer=tokenizer,
+                        ngram_range=(3,6),
+                        max_df = .1,
+                        max_features=5000)
+docs = kr2_cor
+bag2 = count2.fit_transform(docs)
+
+# TF_IDF 벡터화
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf2 = TfidfVectorizer(ngram_range=(3,6), # 유니그램 바이그램으로 사용
+                        min_df = 3, # 3회 미만으로 등장하는 토큰은 무시
+                        max_df =0.95, # 많이 등장한 단어 5%의 토큰도 무시
+                        tokenizer = tokenizer,
+                        token_pattern = None)
+tfidf2.fit(docs)
+docs_soynlp2 = tfidf2.transform(docs)
+
+"""# 잠재 디리클레 할당을 사용한 토픽 모델링"""
+
+# LDA 사용 (BoW 기반)
+from sklearn.decomposition import LatentDirichletAllocation
+lda2 = LatentDirichletAllocation(n_components = 10,
+                                random_state = 1,
+                                learning_method = 'batch')
+
+X_topics2 = lda2.fit_transform(bag2)
+
+# LDA 사용 (tf-idf 기반)
+
+lda_tfidf2 = LatentDirichletAllocation(n_components = 10,
+                                      random_state = 1,
+                                      learning_method = 'batch')
+
+X_topics2 = lda_tfidf2.fit_transform(docs_soynlp2)
+
+"""### 띄어쓰기 한 토픽 모델 결과"""
+
+# 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (BoW 기반)
+n_top_word = 10
+feature_name2 = count2.get_feature_names()
+for topic_idx, topic in enumerate(lda2.components_):
+  print("토픽 %d:" % (topic_idx+1))
+  print([feature_name2[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
+
+# 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (tf-idf 기반)
+n_top_word = 10
+feature_name2 = count2.get_feature_names()
+for topic_idx, topic in enumerate(lda_tfidf2.components_):
+  print("토픽 %d:" % (topic_idx+1))
+  print([feature_name2[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
+
+
+
+"""## Python library for Keyword Extraction
+키워드 / 연관어 추출을 위한 파이썬 라이브러리 입니다
+
+https://github.com/lovit/soykeyword
+
+oykeyword 에서 추출하는 키워드와 연관어는 다음과 같이 정의됩니다. 한 문서 집합의 키워드는 다른 문서 집합과 해당 문서 집합을 구분할 수 있는 질 좋은 단어이며 (구분력, discriminative power), 해당 집합을 잘 설명할 수 있는 (설명력, high coverage) 단어입니다. 빈도수가 낮은 단어는 한 집합에서만 등장할 가능성이 높기 때문에 구분력은 크지만 설명력이 약합니다. 제안된 두 가지 알고리즘은 높은 설명력과 구분력을 동시에 지니는 단어들을 키워드로 선택합니다.
+
+연관어는 기준 단어가 포함된 문서 집합과 포함되지 않은 문서 집합을 구분하는 키워드를 연관어로 정의합니다. 이는 co-occurrence 가 높은 단어라는 의미이기도 합니다. co-occurrence 가 높으면서도 설명력이 좋은 단어를 선택합니다.
+
+### 이것은 각 아이돌 별 댓글 간의 비교 할 때 필요
+"""
+
+!pip install soykeyword
+
+"""## KR-WordRank: Unsupervised Korean Word & Keyword Extractor
+
+### 이것은 textrank와 결과를 비교할 필요 있음
+
+https://github.com/lovit/KR-WordRank
+"""
+
+!pip install soykeyword
