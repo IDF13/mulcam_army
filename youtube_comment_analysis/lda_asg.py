@@ -43,16 +43,14 @@ plt.rc("font", family='Malgun Gothic')
 artist_name=pd.read_csv('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/아티스트이름 - Sheet1.csv')
 name=artist_name['engName']
 name.dropna(inplace=True)
-name=name.reset_index()
-name.drop(['index'],axis=1, inplace=True)
-name[:4]
-
-name.drop([3,5,24,29,37,38,48],axis=0, inplace=True)
-name=name.reset_index()
-name.drop(['index'],axis=1, inplace=True)
+name=name.reset_index(drop=True)
+name.drop([3,5,24,29,37,38,48],axis=0,inplace=True)
+name=name.reset_index(drop=True)
 name[:4]
 
 """# 2.전체 아이돌 분석
+
+#### 전처리 단계 이제 필요 없음
 
 ## 2.1. 유튜브 크롤링 댓글 불러오기
 """
@@ -62,8 +60,8 @@ path = '/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army ᄀ
 
 frames=[]
 keys = []
-for i in range(len(name['engName'])):
-    temp=name['engName'][i]
+for i in range(len(name)):
+    temp=name[i]
     comment_file = f'comments_youtube_{temp}.csv'     #GOT7
     df = pd.read_csv(path+comment_file, encoding='utf-8', header=None)
     # print(df)
@@ -73,7 +71,6 @@ for i in range(len(name['engName'])):
 
 df = pd.concat(frames, ignore_index=True)
 df.columns=['comment','like']
-# df.head()
 
 """##2.2. 중복 값 제거 및 소문자 바꾸기"""
 
@@ -91,7 +88,7 @@ print('중복 제거 후 :',df.shape)
 df['comment'] = df['comment'].str.lower()
 # copy_data.to_csv('concat_txt.csv',encoding='utf-8-sig')
 # df
-df.to_csv('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/comment_all.csv')
+df.to_csv('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/크롤링 한 자료/youtube/comment_all.csv')
 
 """##2.3. 텍스트 전처리 (이모티콘, 특수문자, 의성어 제거)"""
 
@@ -224,9 +221,11 @@ data.head()
 
 data_ko = pd.DataFrame([kor[:1] for kor in data.values if kor[2] == '(ko)'], columns=['comment'])
 data_en = pd.DataFrame([en[:1] for en in data.values if en[2] == '(en)'], columns=['comment'])
-# data_ko.comment.values
+data_ko.comment.values
 
 """# 3.영어 댓글 분석"""
+
+data_en.comment.values[:2]
 
 # 숫자제거 / 밑줄 제외한 특수문자 제거
 p = re.compile("[0-9]+")
@@ -391,12 +390,14 @@ lda_tfidf = LatentDirichletAllocation(n_components = 10,
 
 X_topics = lda_tfidf.fit_transform(docs_tf)
 
+'''
 # 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (tf-idf 기반)
 n_top_word = 10
 feature_name = count.get_feature_names()
 for topic_idx, topic in enumerate(lda_tfidf.components_):
   print("토픽 %d:" % (topic_idx+1))
   print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
+'''
 
 """#4.한글 댓글 분석
 
@@ -862,6 +863,137 @@ for topic_idx, topic in enumerate(lda_tfidf2.components_):
   print([feature_name2[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
 
 """#3.개별 아이돌별 분석
+
+##3.1.영어 댓글
+"""
+
+!pip install rake-nltk
+
+"""### 예시) aespa"""
+
+# 유튜브 크롤링 파일 로드
+path = '/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/크롤링 한 자료/youtube/preprocesing_comment/'
+
+# aespa = name['engName'].str.contains("aespa")
+# aespa_num=name.index[name['engName']=='aespa']
+# print(aespa_num)
+
+# aespa2=name['engName']=='aespa'
+
+comment_file = f'prepro_comments_youtube_aespa.csv'     #aespa
+df = pd.read_csv(path+comment_file, encoding='utf-8', header=None)
+
+print(len(df))
+df.head()
+
+data_ko = pd.DataFrame([kor[:1] for kor in data.values if kor[2] == '(ko)'], columns=['comment'])
+data_en = pd.DataFrame([en[:1] for en in data.values if en[2] == '(en)'], columns=['comment'])
+# data_ko.comment.values
+
+
+
+
+
+"""# 3.영어 댓글 분석"""
+
+# 숫자제거 / 밑줄 제외한 특수문자 제거
+p = re.compile("[0-9]+")
+q = re.compile("\W+")
+r = re.compile('[^a-zA-Z]+')
+
+en = []
+for i in data_en.comment.values:
+  tokens = re.sub(p," ",i)
+  tokens = re.sub(q," ",tokens)
+  tokens = re.sub(r," ", tokens)
+  en.append(tokens)
+len(en)
+
+"""##3.1. 영어 불용어 제거
+
+"""
+
+# 불용어 제거
+import nltk
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize
+
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+stop_words = set(stopwords.words('english')) 
+res=[]
+for i in range(len(en)):
+    word_tokens = word_tokenize(en[i])
+
+    result = []
+    for w in word_tokens: 
+        if w not in stop_words: 
+            result.append(w) 
+    res.append(result)
+
+# print(word_tokens) 
+print(res[:2])
+print(len(res))
+
+"""##3.2. 영어 형태소 분석 / 품사 태깅
+
+"""
+
+en_pos = []
+for i in range(len(res)):
+    tokens_pos = nltk.pos_tag(res[i])
+    en_pos.append(tokens_pos)
+en_pos[:2]
+
+# 명사는 NN을 포함하고 있음을 알 수 있음
+en_NN=[]
+for i in range(len(en_pos)):
+    NN_words = []
+    for word, pos in en_pos[i]:
+        if 'NN' in pos:
+            NN_words.append(word)
+    en_NN.extend(NN_words)
+en_NN[:2]
+
+"""##3.3. 단어(명사) 빈도 분석
+
+"""
+
+#9. 빈도분석
+from collections import Counter
+c = Counter(en_NN) # input type should be a list of words (or tokens)
+k = 20
+print(c.most_common(k)) # 빈도수 기준 상위 k개 단어 출력
+
+"""##3.4. wordcloud 생성"""
+
+#wordclound
+import wordcloud
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+noun_text = ''
+for word in en_NN:
+    noun_text = noun_text +' '+word
+
+wordcloud = WordCloud(max_font_size=60, relative_scaling=.5).generate(noun_text) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+wordcloud.to_file('/content/drive/MyDrive/Colab Notebooks/[공유] Mulcam_Army 공유폴더!/wordcloud.png')
+
+
+
+
+
+
+
+
+
+"""##3.2 한글 댓글
 
 ## Python library for Keyword Extraction
 키워드 / 연관어 추출을 위한 파이썬 라이브러리 입니다
