@@ -322,7 +322,7 @@ print()
 # 위에서 추출한 호텔 카테고리로 클러스터링된 문서들의 인덱스 중 0번인덱스(비교기준문서)제외한
 # 다른 문서들과의 유사도 측정
 similarity = cosine_similarity(ftr_vect[hotel_idx[0]], ftr_vect[hotel_idx])
-print(similarity)
+# print(similarity)
 
 # 비교기준 문서와 다른 문서들간의 유사도 살펴보기
 import seaborn as sns
@@ -352,9 +352,9 @@ hotel_sim_df = pd.DataFrame()
 hotel_sim_df['comment'] = data_en.iloc[hotel_sorted_idx]['comment']
 hotel_sim_df['similarity'] = hotel_sim_values
 
-plt.figure(figsize=(15,10))
-sns.barplot(data=hotel_sim_df[:100], x='similarity', y='comment')
-plt.title(comparison_doc)
+# plt.figure(figsize=(15,10))
+# sns.barplot(data=hotel_sim_df[:100], x='similarity', y='comment')
+# plt.title(comparison_doc)
 
 """https://techblog-history-younghunjo1.tistory.com/114"""
 
@@ -364,49 +364,350 @@ plt.title(comparison_doc)
 
 """
 
+'''
+import numpy as np
+import matplotlib.pyplot as plt
+from copy import deepcopy
+import time
+import nltk
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import time
+time.sleep(1)
+def get_TR(C, d, TR, n, decimal):
+    new_TR = deepcopy(TR)
+    for idx in range(n):
+        res = 0
+        for near_idx in range(n):
+            if C[idx][near_idx] == 0: continue
+            res += C[idx][near_idx] / sum(C[near_idx]) * new_TR[near_idx]
+        res = (1-d)/n + d * res
+        new_TR[idx] = round(res, decimal)
+    return new_TR
+
+def TextRank(C,d, TR, N,decimal):
+    new_TR = deepcopy(TR)
+    for x in range(N):
+        res = 0 
+        for y in range(N):
+            res += C[x][y] / sum(C[y]) * new_TR[y]
+        res = (1-d)/N +d * res
+        new_TR[x] = round(res, decimal)
+    return new_TR
+
+def update_TR(C, d=1, stp=1, decimal=2):
+    """
+    step : 반복 횟수
+    decimal : TR 값 소수점 표출 자리수 지정
+    """
+    n = C.shape[0]
+    TR = [1/n for _ in range(n)]
+    TRs = [TR]
+    errors = []
+    for _ in range(step):
+        new_TR = get_TR(C, d, TR, n, decimal)
+        error = sum([abs(TR[i] - new_TR[i]) for i in range(n)])
+        errors.append(error)
+        TRs.append(new_TR)
+        TR = new_TR
+    return TRs, errors
+
+Text =  np.array([[0, 0.2, 0, 0.3],
+                  [0.2, 0, 0.4, 0],
+                  [0, 0.4, 0, 0],
+                  [0.3, 0, 0, 0]])
+N=Text.shape[0]
+TRs, errors = update_TR(Text, d=0.85, step=10, decimal=4)
+
+# print(TRs)
+# for TR in TRs:
+#      print(TR)
+# print()
+print(f"final TR : {TRs[-1]}")
+print()
+
+plt.plot(errors)
+plt.xlabel('Number of iterations')
+plt.ylabel('Error rate')
+plt.show()
+'''
+
+# text='''\
+# Maria Sharapova has basically no friends as tennis players on the WTA Tour. \
+# The Russian player has no problems in openly speaking about it and in a recent interview she said: \
+# 'I don't really hide any feelings too much. I think everyone knows this is my job here. \
+# When I'm on the courts or when I'm on the court playing, I'm a competitor and I want to beat every \
+# single person whether they're in the locker room or across the net. So I'm not the one to strike up \
+# a conversation about the weather and know that in the next few minutes I have to go and try to win \
+# a tennis match. I'm a pretty competitive girl. I say my hellos, but I'm not sending any players \
+# flowers as well. Uhm, I'm not really friendly or close to many players. I have not a lot of friends \
+# away from the courts.' When she said she is not really close to a lot of players, is that something \
+# strategic that she is doing? Is it different on the men's tour than the women's tour? 'No, not at all. \
+# I think just because you're in the same sport doesn't mean that you have to be friends with everyone \
+# just because you're categorized, you're a tennis player, so you're going to get along with tennis players. \
+# I think every person has different interests. I have friends that have completely different jobs and interests, \
+# and I've met them in very different parts of my life. I think everyone just thinks because we're tennis players \
+# we should be the greatest of friends. But ultimately tennis is just a very small part of what we do. \
+# There are so many other things that we're interested in, that we do.' ALSO READ: Maria Sharapova reveals \
+# how tennis keeps her motivated.'''
+
+# # stopwords = nltk.corpus.stopwords.words('english')
+# # stopwords.extend(['.'])
+
+# # sentences_org = nltk.sent_tokenize(text)
+# # sentences = []
+# # print('데이터 전처리 시작...')
+# # for sentence in sentences_org:
+# #     words = nltk.word_tokenize(sentence)
+# #     words = [word for word in words if word not in stopwords] # 불용어 제거
+# #     words = [word.lower() for word in words] # 소문자 변환
+# #     sentences.append(' '.join(words))
+# # print('데이터 전처리 종료...')
+# # print()
+'''
+tfidf = TfidfVectorizer()
+tfidf_matrix = tfidf.fit_transform(en_sent).toarray()
+n = tfidf_matrix.shape[0]
+C = np.zeros(shape=(n, n))
+print('유사도 행렬(C) 계산 시작...')
+for i in range(n):
+    for j in range(n):
+        sim = cosine_similarity(tfidf_matrix[i:i+1], tfidf_matrix[j:j+1])
+        C[i][j] = sim
+        C[j][i] = sim
+np.fill_diagonal(C, 0)
+print('유사도 행렬(C) 계산 종료...')
+print()
+
+# print(C)
+# print()
+
+print('TR 업데이트 시작...')
+TRs, errors = update_TR(C, d=0.85, step=10, decimal=3)
+print('TR 업데이트 종료...')
+print()
+
+# for TR in TRs:
+#     print(TR)
+# print()
+
+final_TR = TRs[-1]
+print(f"final TR : {final_TR}")
+print()
+
+imp_sentence_idx = np.argmax(final_TR)
+print(f"most important sentence : {en[imp_sentence_idx]}")
+print()
+
+plt.plot(errors)
+plt.xlabel('Number of iterations')
+plt.ylabel('Error rate')
+plt.show()
+'''
+
+from collections import Counter
+
+def scan_vocabulary(sents, tokenize, min_count=2):
+    counter = Counter(w for sent in sents for w in tokenize(sent))
+    counter = {w:c for w,c in counter.items() if c >= min_count}
+    idx_to_vocab = [w for w, _ in sorted(counter.items(), key=lambda x:-x[1])]
+    vocab_to_idx = {vocab:idx for idx, vocab in enumerate(idx_to_vocab)}
+    return idx_to_vocab, vocab_to_idx
+    
+from collections import defaultdict
+
+def cooccurrence(tokens, vocab_to_idx, window=2, min_cooccurrence=2):
+    counter = defaultdict(int)
+    for s, tokens_i in enumerate(tokens):
+        vocabs = [vocab_to_idx[w] for w in tokens_i if w in vocab_to_idx]
+        n = len(vocabs)
+        for i, v in enumerate(vocabs):
+            if window <= 0:
+                b, e = 0, n
+            else:
+                b = max(0, i - window)
+                e = min(i + window, n)
+            for j in range(b, e):
+                if i == j:
+                    continue
+                counter[(v, vocabs[j])] += 1
+                counter[(vocabs[j], v)] += 1
+    counter = {k:v for k,v in counter.items() if v >= min_cooccurrence}
+    n_vocabs = len(vocab_to_idx)
+    return dict_to_mat(counter, n_vocabs, n_vocabs)
+from scipy.sparse import csr_matrix
+
+def dict_to_mat(d, n_rows, n_cols):
+    rows, cols, data = [], [], []
+    for (i, j), v in d.items():
+        rows.append(i)
+        cols.append(j)
+        data.append(v)
+    return csr_matrix((data, (rows, cols)), shape=(n_rows, n_cols))
+def word_graph(sents, tokenize=None, min_count=2, window=2, min_cooccurrence=2):
+    idx_to_vocab, vocab_to_idx = scan_vocabulary(sents, tokenize, min_count)
+    tokens = [tokenize(sent) for sent in sents]
+    g = cooccurrence(tokens, vocab_to_idx, window, min_cooccurrence, verbose)
+    return g, idx_to_vocab
+import numpy as np
+from sklearn.preprocessing import normalize
+
+def pagerank(x, df=0.85, max_iter=30):
+    assert 0 < df < 1
+
+    # initialize
+    A = normalize(x, axis=0, norm='l1')
+    R = np.ones(A.shape[0]).reshape(-1,1)
+    bias = (1 - df) * np.ones(A.shape[0]).reshape(-1,1)
+
+    # iteration
+    for _ in range(max_iter):
+        R = df * (A * R) + bias
+
+    return R
+def textrank_keyword(sents, tokenize, min_count, window, min_cooccurrence, df=0.85, max_iter=30, topk=30):
+    g, idx_to_vocab = word_graph(sents, tokenize, min_count, window, min_cooccurrence)
+    R = pagerank(g, df, max_iter).reshape(-1)
+    idxs = R.argsort()[-topk:]
+    keywords = [(idx_to_vocab[idx], R[idx]) for idx in reversed(idxs)]
+    return keywords
+
+from collections import Counter
+from scipy.sparse import csr_matrix
+import math
+
+def sent_graph(sents, tokenize, similarity, min_count=2, min_sim=0.3):
+    _, vocab_to_idx = scan_vocabulary(sents, tokenize, min_count)
+
+    tokens = [[w for w in tokenize(sent) if w in vocab_to_idx] for sent in sents]
+    rows, cols, data = [], [], []
+    n_sents = len(tokens)
+    for i, tokens_i in enumerate(tokens):
+        for j, tokens_j in enumerate(tokens):
+            if i >= j:
+                continue
+            sim = similarity(tokens_i, tokens_j)
+            if sim < min_sim:
+                continue
+            rows.append(i)
+            cols.append(j)
+            data.append(sim)
+    return csr_matrix((data, (rows, cols)), shape=(n_sents, n_sents))
+
+def textrank_sent_sim(s1, s2):
+    n1 = len(s1)
+    n2 = len(s2)
+    if (n1 <= 1) or (n2 <= 1):
+        return 0
+    common = len(set(s1).intersection(set(s2)))
+    base = math.log(n1) + math.log(n2)
+    return common / base
+
+def cosine_sent_sim(s1, s2):
+    if (not s1) or (not s2):
+        return 0
+
+    s1 = Counter(s1)
+    s2 = Counter(s2)
+    norm1 = math.sqrt(sum(v ** 2 for v in s1.values()))
+    norm2 = math.sqrt(sum(v ** 2 for v in s2.values()))
+    prod = 0
+    for k, v in s1.items():
+        prod += v * s2.get(k, 0)
+    return prod / (norm1 * norm2)
+def textrank_keysentence(sents, tokenize, min_count, similarity, df=0.85, max_iter=30, topk=5):
+    g = sent_graph(sents, tokenize, min_count, min_sim, similarity)
+    R = pagerank(g, df, max_iter).reshape(-1)
+    idxs = R.argsort()[-topk:]
+    keysents = [(idx, R[idx], sents[idx]) for idx in reversed(idxs)]
+    return keysents
+
+!pip install textrank
+
+'''
+from textrank import KeywordSummarizer
+def nltk_tokenize(sent):
+    words = nltk.pos_tag(sent, join=True)
+    words = [w for w in words if ('/NN' in w or '/XR' in w or '/VA' in w or '/VV' in w)]
+    return words
+
+keyword_extractor = KeywordSummarizer(
+    tokenize = nltk_tokenize,
+    window = -1,
+    verbose = False
+)
+
+keywords = keyword_extractor.summarize(res, topk=30)
+    
+def komoran_tokenize(sent):
+    return komoran.pos(sent, join=True)
+
+keyword_extractor = KeywordSummarizer(tokenize = komoran_tokenize, window = -1)
+keywords = keyword_extractor.summarize(sents, topk=30)
+
+def komoran_tokenize(sent):
+    words = komoran.pos(sent, join=True)
+    words = [w for w in words if ('/NN' in w or '/XR' in w or '/VA' in w or '/VV' in w)]
+    return words
+
+keyword_extractor = KeywordSummarizer(tokenize = komoran_tokenize, window = 2)
+keywords = keyword_extractor.summarize(sents, topk=30)
+
+from textrank import KeysentenceSummarizer
+
+summarizer = KeysentenceSummarizer(tokenize = komoran_tokenize, min_sim = 0.5)
+keysents = summarizer.summarize(sents, topk=10)
+
+summarizer = KeysentenceSummarizer(tokenize = komoran_tokenizer, min_sim = 0.3)
+keysents = summarizer.summarize(sents, topk=3)
+
+
+def subword_tokenizer(sent, n=3):
+    def subword(token, n):
+        if len(token) <= n:
+            return [token]
+        return [token[i:i+n] for i in range(len(token) - n)]
+    return [sub for token in sent.split() for sub in subword(token, n)]
+
+subword_tokenizer('이것은 부분단어의 예시입니다 짧은 어절은 그대로 나옵니다')
+# ['이것은', '부분단', '분단어', '단어의', '예시입', '시입니', '입니다', '짧은', '어절은', '그대로', '나옵니', '옵니다']
+
+summarizer = KeysentenceSummarizer(tokenize = subword_tokenizer, min_sim = 0.3)
+keysents = summarizer.summarize(sents, topk=3)
+
+
+summarizer.R
+
+import numpy as np
+
+bias = np.ones(len(sents))
+bias[-1] = 10
+keysents = summarizer.summarize(sents, topk=3, bias=bias)
+
+summarizer.R
+'''
+
+from gensim.summarization.summarizer import summarize
+en_total=[]
+for i in range(len(en_sent)):
+    en_total.append(en_sent[i])
+en_total[:10]
+a="\n".join(en_total)
+summarize(a).split('\n')
+
+
+
+
+
 
 
 """Word2vec"""
 
-import pandas as pd
-import numpy as np
-import glob
-from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
-from nltk.tokenize import RegexpTokenizer
-from gensim.models.word2vec import Word2Vec
 
-# # 데이터 읽어오기/벡터로 만들기
-# pos_review = glob.glob("d:/deeplearning/textmining/pos/*.txt")[0:100]
-# pos_lines = []
-# for i in pos_review:
-#      try:
-#           f = open(i, "r")
-#           temp = f.readlines()[0]
-#           pos_lines.append(temp)
-#           f.close
-#      except Exception as e:
-#           continue
 
- 
 
-# len(pos_lines)
 
-# # 단어 추출하기
-stop_words = stopwords.words("english")
-tokenizer = RegexpTokenizer("[\w]+")
 
-text = []
-for line in en_sent:
-     words = line.lower()
-     tokens = tokenizer.tokenize(words)
-     stopped_tokens = [i for i in list(set(tokens)) if not i in stop_words + ["br"]]
-     stopped_tokens2 = [i for i in stopped_tokens if len(i) > 1]
-     text.append(stopped_tokens2)
 
-# word2vec 기반의 연관어 분석
-model = Word2Vec(en_sent, sg = 1, window = 2, min_count = 3)
-model.init_sims(replace = True)
-model.wv.similarity("fire", "aespa")
-model.wv.most_similar("good", topn = 10)
+
 
