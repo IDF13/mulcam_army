@@ -1,59 +1,59 @@
-,artist_kor,artist_eng
-0,갓세븐,GOT7
-1,강다니엘,KANG DANIEL
-2,골든차일드,GOLDEN CHILD
-3,김세정,KIM SE JEONG
-4,김재환,KIM JAEHWAN
-5,뉴이스트,NU'EST
-6,더보이즈,THE BOYZ
-7,데이식스,DAY6
-8,레드벨벳,RED VELVET
-9,마마무,MAMAMOO
-10,몬스타엑스,MONSTA X
-11,박지훈,PARK JIHOON
-12,브레이브걸스,Brave Girls
-13,블락비,BLOCK B
-14,블랙핑크,BLACKPINK
-15,비투비,BTOB
-16,빅톤,VICTON
-17,샤이니,SHINee
-18,세븐틴,SEVENTEEN
-19,소녀시대,GIRLS' GENERATION
-20,스테이씨,STAYC
-21,슈퍼주니어,SUPER JUNIOR
-22,스트레이 키즈,Stray Kids
-23,(여자)아이들,(G)I-DLE
-24,아스트로,ASTRO
-25,아이유,IU
-26,아이즈원,IZ*ONE
-27,악뮤,AKMU
-28,에스에프나인,SF9
-29,에스파,aespa
-30,에이비식스,AB6IX
-31,에이티즈,ATEEZ
-32,에이핑크,APINK
-33,엑소,EXO
-34,엔시티,NCT
-35,엔플라잉,N.Flying
-36,엔하이픈,ENHYPEN
-37,여자친구,GFRIEND
-38,오마이걸,OH MY GIRL
-39,온앤오프,ONF
-40,원어스,ONEUS
-41,원호,WONHO
-42,위너,WINNER
-43,위아이,WEi
-44,위클리,WEEEKLY
-45,이달의 소녀,LOONA
-46,있지,ITZY
-47,정세운,JEONG SEWOON
-48,크래비티,CRAVITY
-49,투모로우바이투게더,TXT
-50,투피엠,2PM
-51,트레저,TREASURE
-52,트와이스,TWICE
-53,펜타곤,PENTAGON
-54,퍼플키스,PURPLE KISS
-55,프로미스나인,fromis_9
-56,하성운,HA SUNG WOON
-57,하이라이트,HIGHLIGHT
+,artist_kor,artist_eng,video_url
+0,갓세븐,GOT7,https://www.youtube.com/c/GOT7/videos
+1,강다니엘,KANG DANIEL,https://www.youtube.com/c/%EA%B0%95%EB%8B%A4%EB%8B%88%EC%97%98KANGDANIEL/videos
+2,골든차일드,GOLDEN CHILD,https://www.youtube.com/c/GoldenChild/videos
+3,김세정,KIM SE JEONG,https://www.youtube.com/c/OFFICIALKIMSEJEONG0828/videos
+4,김재환,KIM JAEHWAN,https://www.youtube.com/channel/UC1RjCqJ8nlQq-kx7mXYhPWg/videos
+5,뉴이스트,NU'EST,https://www.youtube.com/user/pledisnuest/videos
+6,더보이즈,THE BOYZ,https://www.youtube.com/c/THEBOYZofficial/videos
+7,데이식스,DAY6,https://www.youtube.com/c/DAY6Official/videos
+8,레드벨벳,RED VELVET,https://www.youtube.com/c/redvelvet/videos
+9,마마무,MAMAMOO,https://www.youtube.com/c/MAMAMOO_OFFICIAL/videos
+10,몬스타엑스,MONSTA X,https://www.youtube.com/c/monstax/videos
+11,박지훈,PARK JIHOON,https://www.youtube.com/c/PARKJIHOONOfficial/videos
+12,브레이브걸스,Brave Girls,https://www.youtube.com/channel/UCx_kYu6Wp1yxZP_KtrW52EQ/videos
+13,블락비,BLOCK B,https://www.youtube.com/user/7seasons2013/videos
+14,블랙핑크,BLACKPINK,https://www.youtube.com/c/BLACKPINKOFFICIAL/videos
+15,비투비,BTOB,https://www.youtube.com/c/officialbtob/videos
+16,빅톤,VICTON,https://www.youtube.com/c/VICTON1109/videos
+17,샤이니,SHINee,https://www.youtube.com/user/SHINee/videos
+18,세븐틴,SEVENTEEN,https://www.youtube.com/user/pledis17/videos
+19,소녀시대,GIRLS' GENERATION,https://www.youtube.com/user/GIRLSGENERATION/videos
+20,스테이씨,STAYC,https://www.youtube.com/c/STAYC/videos
+21,슈퍼주니어,SUPER JUNIOR,https://www.youtube.com/user/SUPERJUNIOR/videos
+22,스트레이 키즈,Stray Kids,https://www.youtube.com/c/StrayKids/videos
+23,(여자)아이들,(G)I-DLE,https://www.youtube.com/c/gidleofficial/videos
+24,아스트로,ASTRO,https://www.youtube.com/c/offclASTRO/videos
+25,아이유,IU,https://www.youtube.com/c/dlwlrma/videos
+26,아이즈원,IZ*ONE,https://www.youtube.com/c/officialIZONE/videos
+27,악뮤,AKMU,https://www.youtube.com/c/officialAKMU/videos
+28,에스에프나인,SF9,https://www.youtube.com/c/SF9official/videos
+29,에스파,aespa,https://www.youtube.com/c/aespa/videos
+30,에이비식스,AB6IX,https://www.youtube.com/c/AB6IX/videos
+31,에이티즈,ATEEZ,https://www.youtube.com/c/ATEEZofficial/videos
+32,에이핑크,APINK,https://www.youtube.com/c/officialapink/videos
+33,엑소,EXO,https://www.youtube.com/c/weareoneEXO/videos
+34,엔시티,NCT,https://www.youtube.com/c/nctsmtown/videos
+35,엔플라잉,N.Flying,https://www.youtube.com/c/nflyingofficial/videos
+36,엔하이픈,ENHYPEN,https://www.youtube.com/c/ENHYPENOFFICIAL/videos
+37,여자친구,GFRIEND,https://www.youtube.com/c/gfrdofficial/videos
+38,오마이걸,OH MY GIRL,https://www.youtube.com/c/OHMYGIRL/videos
+39,온앤오프,ONF,https://www.youtube.com/c/ONF_OFFICIAL/videos
+40,원어스,ONEUS,https://www.youtube.com/c/ONEUS/videos
+41,원호,WONHO,https://www.youtube.com/c/WONHOofficial/videos
+42,위너,WINNER,https://www.youtube.com/c/OfficialYGWINNER/videos
+43,위아이,WEi,https://www.youtube.com/c/WEiOfficial/videos
+44,위클리,WEEEKLY,https://www.youtube.com/c/Weeekly/videos
+45,이달의 소녀,LOONA,https://www.youtube.com/c/loonatheworld/videos
+46,있지,ITZY,https://www.youtube.com/c/ITZY/videos
+47,정세운,JEONG SEWOON,https://www.youtube.com/c/jeongsewoon/videos
+48,크래비티,CRAVITY,https://www.youtube.com/c/CRAVITYstarship/videos
+49,투모로우바이투게더,TXT,https://www.youtube.com/c/TXT_bighit/videos
+50,투피엠,2PM,https://www.youtube.com/user/2pm/videos
+51,트레저,TREASURE,https://www.youtube.com/c/OfficialTreasure/videos
+52,트와이스,TWICE,https://www.youtube.com/c/TWICE/videos
+53,펜타곤,PENTAGON,https://www.youtube.com/c/officialpentagon/videos
+54,퍼플키스,PURPLE KISS,https://www.youtube.com/c/PURPLEKISS/videos
+55,프로미스나인,fromis_9,https://www.youtube.com/c/Officialfromis9/videos
+56,하성운,HA SUNG WOON,https://www.youtube.com/c/%ED%95%98%EC%84%B1%EC%9A%B4HASUNGWOON/videos
+57,하이라이트,HIGHLIGHT,https://www.youtube.com/c/OFFICIALHIGHLIGHT/videos

@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 
-def get_image_title(url):
+def get_video_title(url):
     # 웹 드라이버 초기화
     driver_path = "C:/Users/User/Desktop/workspace/vsc/chromedriver.exe"
     driver = webdriver.Chrome(driver_path)
@@ -80,5 +80,5 @@ def get_image_title(url):
     return df
 
 # aespa
-url1 = 'https://www.youtube.com/c/aespa/videos'
-get_image_title(url1)
+# url1 = 'https://www.youtube.com/c/aespa/videos'
+# get_video_title(url1)
