@@ -75,7 +75,7 @@ def get_video_title(url):
     driver.close()
     df=pd.DataFrame([title_list,view_list, link_list, image_list]).T
     df.columns=['title_list','view_list', 'link_list', 'image_list']
-    df.to_csv(f'C:/Users/User/Desktop/workspace/mulcam_army/youtube_crawlers/aespa_youtube_info.csv', index_label='idx')
+    df.to_csv(f'C:/Users/User/Desktop/workspace/mulcam_army/youtube_crawlers/{url[24:-1]}_youtube_info.csv', index_label='idx')
     
     return df
 
