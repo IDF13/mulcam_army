@@ -27,8 +27,8 @@ def get_image_title(url):
             title_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/h3/a'
             viewcnt_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/span[1]'
             period_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/span[2]'
-            # 이미지가 곧바로 로드 되지 않을 때, 20초간 강제로 기다림
-            img = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.XPATH, img_xpath)))
+            # 이미지가 곧바로 로드 되지 않을 때, 10초간 강제로 기다림
+            img = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.XPATH, img_xpath)))
             if img is None:
                 print(idx, 'img is not loaded.')
 
@@ -59,10 +59,10 @@ def get_image_title(url):
             view = driver.find_element_by_xpath(viewcnt_xpath)
             view_list.append(view.text)
 
-            # 시간을 리스트에 저장
-            period = driver.find_element_by_xpath(period_xpath)
-            periods_list.append(period)
-            print(idx, title.text, view.text, period.text, link_url, img_url)
+            # # 시간을 리스트에 저장
+            # period = driver.find_element_by_xpath(period_xpath)
+            # periods_list.append(period)
+            print(idx, title.text, view.text, link_url, img_url)
 
             idx += 1
 
@@ -73,9 +73,9 @@ def get_image_title(url):
 
     assert len(image_list) == len(title_list)
     driver.close()
-    df=pd.DataFrame([link_list, image_list, view_list, periods_list, title_list]).T
-    df.columns=['link_list', 'image_list', 'view_list', 'periods_list', 'title_list']
-    df.to_csv(f'youtube_info.csv')
+    df=pd.DataFrame([title_list,view_list, link_list, image_list]).T
+    df.columns=['title_list','view_list', 'link_list', 'image_list']
+    df.to_csv(f'aespa_youtube_info.csv')
     
     return df
 
