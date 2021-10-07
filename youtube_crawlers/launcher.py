@@ -6,7 +6,5 @@ video_url = ['https://www.youtube.com/c/GOT7/videos','https://www.youtube.com/c/
 df = pd.read_csv('C:/Users/User/Desktop/workspace/mulcam_army/blip_artists_list.csv', index_col=0)  # 여기만 바꿔주시면 됩니다!
 df['video_url']=video_url
 
-df.to_csv('C:/Users/User/Desktop/workspace/mulcam_army/blip_artists_list.csv')
-print(df.head())
-
-
+for i in df.video_url:
+    get_video_title(i)
