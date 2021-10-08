@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
+import re
 
 def get_video_title(url):
     # 웹 드라이버 초기화
@@ -20,13 +21,18 @@ def get_video_title(url):
     periods_list = list()
     idx = 1
    
+    name = driver.find_element_by_id('text-container').text
+    name =name.replace(' ', '')
+    name = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]', '', name)
+
+
     while True:
         try:
             link_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/h3/a'
             img_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/ytd-thumbnail/a/yt-img-shadow/img'
             title_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/h3/a'
             viewcnt_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/span[1]'
-            period_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/span[2]'
+            # period_xpath = '/html/body/ytd-app/div/ytd-page-manager/ytd-browse/ytd-two-column-browse-results-renderer/div[1]/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-grid-renderer/div[1]/ytd-grid-video-renderer['+str(idx)+']/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/span[2]'
             # 이미지가 곧바로 로드 되지 않을 때, 10초간 강제로 기다림
             img = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.XPATH, img_xpath)))
             if img is None:
@@ -40,6 +46,7 @@ def get_video_title(url):
                 time.sleep(0.5)
                 driver.execute_script('window.scrollBy(0, 1080);')
                 time.sleep(0.5)
+
 
             # 동영상 링크를 리스트에 저장
             link = driver.find_element_by_xpath(link_xpath)
@@ -75,7 +82,7 @@ def get_video_title(url):
     driver.close()
     df=pd.DataFrame([title_list,view_list, link_list, image_list]).T
     df.columns=['title_list','view_list', 'link_list', 'image_list']
-    df.to_csv(f'C:/Users/User/Desktop/workspace/mulcam_army/youtube_crawlers/{url[24:-1]}_youtube_info.csv', index_label='idx')
+    df.to_csv(f'C:/Users/User/Desktop/workspace/mulcam_army/youtube_crawlers/{name}_youtube_info.csv', index_label='idx')
     
     return df
 
