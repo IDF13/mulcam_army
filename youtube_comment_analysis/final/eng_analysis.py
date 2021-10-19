@@ -612,7 +612,7 @@ print(topic_term_prob[0].sum())  # 1.0
 
 
 
-# In[ ]:
+# In[116]:
 
 
 # TF_IDF 벡터화
@@ -789,38 +789,20 @@ with open('/home/lab10/final/key_score.txt', 'w') as f:
 
 # # k-means
 
-# In[ ]:
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[52]:
-
-
-# 텍스트 단어들의 어근 원형을 추출하기 위해 함수 생성
+# In[126]:
 
 
 # Tf-idf 벡터화시키면서 cusotmized해준 토큰화+어근추출 방식 tokenizer인자에 넣어주기
 # 벡터화시킬 Tf-idf 도구 옵션 추가해서 구축
-# 1,2gram적용, 빈도수 0.05이하, 0.85이상의 빈도수 단어들 제거
-tfidf_vect = TfidfVectorizer(ngram_range=(1,2),
-                            min_df=0.05, max_df=0.85)
+# 3,6gram적용, 빈도수 0.05이하, 0.85이상의 빈도수 단어들 제거
+tfidf_vect = TfidfVectorizer(ngram_range=(1,3),
+                            min_df=0.05, max_df=0.95)
 # fit_transform으로 위에서 구축한 도구로 텍스트 벡터화
 ftr_vect = tfidf_vect.fit_transform(en_sent)
 
-
-# In[53]:
-
-
 # K-means로 6개 군집으로 문서 군집화시키기
 
-
-kmeans = KMeans(n_clusters=6, max_iter=10000, random_state=42)
+kmeans = KMeans(n_clusters=5, max_iter=10000, random_state=42)
 # 비지도 학습이니 feature로만 학습시키고 예측
 cluster_label = kmeans.fit_predict(ftr_vect)
 
@@ -829,7 +811,7 @@ data_en['label'] = cluster_label
 print(data_en.sort_values(by=['label']))
 
 
-# In[54]:
+# In[127]:
 
 
 # 문서의 feature(단어별) cluster_centers_확인해보자
@@ -839,7 +821,7 @@ print(cluster_centers)
 # shape의 행은 클러스터 레이블, 열은 벡터화 시킨 feature(단어들)
 
 
-# In[55]:
+# In[134]:
 
 
 def get_cluster_details(cluster_model, cluster_data, feature_names,
@@ -878,15 +860,15 @@ def print_cluster_details(cluster_details):
         print()
         print("상위 5개 feature단어들:\n", cluster_detail['top_features'])
         print()
-        print(f"Cluster {cluster_num}으로 분류된 문서들:\n{cluster_detail['comment'][:5]}")
+        print(f"Cluster {cluster_num}으로 분류된 문서들:\n{cluster_detail['comment'][:10]}")
         print('-'*20)
 
 feature_names = tfidf_vect.get_feature_names()
 cluster_details = get_cluster_details(cluster_model=kmeans,
                                      cluster_data=data_en,
                                      feature_names=feature_names,
-                                     cluster_num=6,
-                                     top_n_features=10)
+                                     cluster_num=5,
+                                     top_n_features=5)
 print_cluster_details(cluster_details)
 
 
