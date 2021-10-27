@@ -325,12 +325,29 @@ X_topics = lda.fit_transform(bag)
 # 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (BoW 기반)
 n_top_word = 10
 feature_name = count.get_feature_names()
+
 for topic_idx, topic in enumerate(lda.components_):
   print("토픽 %d:" % (topic_idx+1))
   print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
+    
 
 
 # In[31]:
+
+
+f = open(path2+comment_file+'_ko.txt', 'w')
+for topic_idx, topic in enumerate(lda.components_):
+    a="토픽 %d:" % (topic_idx+1)
+    f.write('\n'+a)
+    b=[]
+    for i in topic.argsort()[:-n_top_word - 1: -1]:
+        f.write(feature_name[i])
+        b.append(feature_name[i])    
+    
+f.close()
+
+
+# In[32]:
 
 
 pyLDAvis.enable_notebook()
@@ -338,19 +355,19 @@ vis = pyLDAvis.sklearn.prepare(lda, bag, count)
 pyLDAvis.display(vis)
 
 
-# In[32]:
+# In[33]:
 
 
 pyLDAvis.save_html(vis, path2+comment_file+'lda_ko.html')
 
 
-# In[33]:
+# In[34]:
 
 
 ko_sent[:10]
 
 
-# In[34]:
+# In[35]:
 
 
 model = LatentDirichletAllocation(n_components = 5,
@@ -360,14 +377,14 @@ model = LatentDirichletAllocation(n_components = 5,
 model.fit(bag) # model.fit_transform(X) is also available
 
 
-# In[35]:
+# In[36]:
 
 
 tokenized_doc = data_ko['ko_sent'].apply(lambda x: x.split()) # 토큰화
 tokenized_doc
 
 
-# In[36]:
+# In[37]:
 
 
 vectorizer = TfidfVectorizer(stop_words='english',
@@ -380,7 +397,9 @@ X = vectorizer.fit_transform(ko_sent)
 X.shape # TF-IDF 행렬의 크기 확인
 
 
-# In[37]:
+# ## 특이값 분해 
+
+# In[38]:
 
 
 svd_model = TruncatedSVD(n_components=5, algorithm='randomized', n_iter=100, random_state=122)
@@ -388,13 +407,13 @@ svd_model.fit(X)
 len(svd_model.components_)
 
 
-# In[38]:
+# In[39]:
 
 
 np.shape(svd_model.components_)
 
 
-# In[39]:
+# In[40]:
 
 
 # CountVectorizer객체내의 전체 word들의 명칭을 get_features_names( )를 통해 추출
@@ -407,7 +426,7 @@ def get_topics(components, feature_names, n=10):
 get_topics(svd_model.components_,terms)
 
 
-# In[40]:
+# In[41]:
 
 
 dictionary = corpora.Dictionary(tokenized_doc)
@@ -415,19 +434,19 @@ corpus = [dictionary.doc2bow(text) for text in tokenized_doc]
 print(corpus[1]) # 수행된 결과에서 두번째 뉴스 출력. 첫번째 문서의 인덱스는 0
 
 
-# In[41]:
+# In[42]:
 
 
 print(dictionary[12])
 
 
-# In[42]:
+# In[43]:
 
 
 len(dictionary)
 
 
-# In[43]:
+# In[44]:
 
 
 NUM_TOPICS = 5 #5개의 토픽, k=5
@@ -437,7 +456,15 @@ for topic in topics:
     print(topic)
 
 
-# In[44]:
+# In[45]:
+
+
+f = open(path2+comment_file+'ko_2.txt', 'w')
+f.write(str(topics))
+f.close()
+
+
+# In[46]:
 
 
 pyLDAvis.enable_notebook()
@@ -445,13 +472,13 @@ vis2 = pyLDAvis.gensim_models.prepare(ldamodel, corpus, dictionary)
 pyLDAvis.display(vis2)
 
 
-# In[45]:
+# In[47]:
 
 
 pyLDAvis.save_html(vis2, path2+comment_file+'lda_dic_ko.html')
 
 
-# In[46]:
+# In[48]:
 
 
 for i, topic_list in enumerate(ldamodel[corpus]):
@@ -460,7 +487,7 @@ for i, topic_list in enumerate(ldamodel[corpus]):
     print(i,'번째 문서의 topic 비율은',topic_list)
 
 
-# In[47]:
+# In[49]:
 
 
 def make_topictable_per_doc(ldamodel, corpus):
@@ -485,7 +512,7 @@ def make_topictable_per_doc(ldamodel, corpus):
     return(topic_table)
 
 
-# In[48]:
+# In[50]:
 
 
 topictable = make_topictable_per_doc(ldamodel, corpus)
@@ -494,14 +521,14 @@ topictable.columns = ['문서 번호', '가장 비중이 높은 토픽', '가장
 topictable[:10]
 
 
-# In[49]:
+# In[51]:
 
 
 topic_word = model.components_ # model.components_also works
 n_top_words = 5   # TOPIC으로 선정될 단어의 수
 
 
-# In[50]:
+# In[52]:
 
 
 def get_topic_term_prob(lda_model):

@@ -3,7 +3,7 @@
 
 # # 필요 라이브러리 설치
 
-# In[12]:
+# In[1]:
 
 
 get_ipython().system('pip install pandas')
@@ -13,7 +13,7 @@ get_ipython().system('pip install warnings')
 
 # # import
 
-# In[15]:
+# In[2]:
 
 
 import pandas as pd
@@ -44,9 +44,10 @@ import nltk
 import string
 from sklearn.cluster import KMeans
 import warnings
+from PIL import Image
 
 
-# In[16]:
+# In[3]:
 
 
 warnings.filterwarnings(action='ignore')
@@ -54,20 +55,20 @@ warnings.filterwarnings(action='ignore')
 
 # # 파일 로드
 
-# In[17]:
+# In[4]:
 
 
 # 유튜브 크롤링 파일 로드
 path = '/home/lab10/final/pre/'
 
-comment_file = 'prepro_stats_page_640세븐틴.csv'    #
+comment_file = 'prepro_comments_2PM.csv'    #
 data = pd.read_csv(path+comment_file, encoding='utf-8', header=None)
 data.columns = ['comment','like','lang']
 print(len(data))
 data.head()
 
 
-# In[18]:
+# In[5]:
 
 
 # data.like.describe(percentiles=[0.75])
@@ -83,25 +84,25 @@ data_en = pd.DataFrame([en[:1] for en in data.values if en[2] == '(en)'], column
 data_en.comment.values
 
 
-# In[19]:
+# In[6]:
 
 
 data_ko.comment.values
 
 
-# In[20]:
+# In[7]:
 
 
 for i in range(len(data_en.comment)):
     data_en.comment[i] = str(data_en.comment[i])
 
 
-# In[21]:
+# In[8]:
 
 
 # 숫자제거 / 밑줄 제외한 특수문자 제거
-p = re.compile("[0-7]+")
-z = re.compile("[8-9]+")
+p = re.compile("[0-1]+")
+z = re.compile("[3-9]+")
 q = re.compile("\W+")
 r = re.compile('[^a-zA-Z]+')
 
@@ -115,7 +116,7 @@ for i in data_en.comment.values:
 len(en)
 
 
-# In[22]:
+# In[9]:
 
 
 en[:2]
@@ -123,7 +124,7 @@ en[:2]
 
 # # 불용어 제거
 
-# In[23]:
+# In[10]:
 
 
 nltk.download('stopwords')
@@ -131,11 +132,12 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 
-# In[24]:
+# In[11]:
 
 
 stop_words = set(stopwords.words('english')) 
 # stop_words.update(('song','group','songs','youtube','views','time','https','girl','girls','people','yes','lol','video','part','member','members', 'look','way','guys','fans','fan'))
+# stop
 
 res=[]
 for i in range(len(en)):
@@ -152,7 +154,7 @@ print(res[:10])
 print(len(res))
 
 
-# In[25]:
+# In[12]:
 
 
 en_pos = []
@@ -163,7 +165,7 @@ for i in range(len(res)):
 en_pos[:5]
 
 
-# In[26]:
+# In[13]:
 
 
 # 명사는 NN을 포함하고 있음을 알 수 있음
@@ -179,7 +181,7 @@ for i in range(len(en_pos)):
 en_NN[:10]
 
 
-# In[27]:
+# In[14]:
 
 
 #9. 빈도분석
@@ -189,7 +191,7 @@ k = 20
 print(c.most_common(k)) # 빈도수 기준 상위 k개 단어 출력
 
 
-# In[28]:
+# In[15]:
 
 
 #wordclound
@@ -198,25 +200,31 @@ for word in en_NN:
     noun_text = noun_text +' '+word
 
 
-# In[32]:
+# In[16]:
 
 
 path2='/home/lab10/final/'
-filename = 'stats_page_640세븐틴'
+filename = comment_file
 
 
-# In[33]:
+# In[17]:
 
 
-wordcloud = WordCloud(max_font_size=60, relative_scaling=.5).generate(noun_text) # generate() 는 하나의 string value를 입력 받음
+youtube=np.array(Image.open('/home/lab10/final/pngwing.com (4).png'))
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5, mask=youtube).generate(noun_text) # generate() 는 하나의 string value를 입력 받음
 plt.figure()
 plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis("off")
 plt.show()
-wordcloud.to_file(path2+'wordcloud'+filename+'.png')
 
 
-# In[34]:
+# In[68]:
+
+
+wordcloud.to_file(path2+'wordcloud'+'_en_'+filename+'.png')
+
+
+# In[19]:
 
 
 ## 3단어 이하 짧은 단어 제거
@@ -231,7 +239,7 @@ for i in range(len(res)):
 en_sent_less3[:2]
 
 
-# In[35]:
+# In[20]:
 
 
 en_sent =[]
@@ -241,32 +249,33 @@ for i in range(len(en_sent_less3)):
 en_sent[:15]
 
 
-# In[104]:
+# In[21]:
 
 
 data_en['en_sent']=en_sent
 
 
-# In[106]:
+# In[22]:
 
 
 data_en.tail()
 
 
-# In[107]:
+# In[23]:
 
 
 # BoW 모델로 벡터화
 count = CountVectorizer(ngram_range=(3,6),
-                        max_df = .1,
-                        max_features=5000, stop_words=None)
+                        max_df = 0.05,
+                        max_features=10000, stop_words=None)
 docs = en_sent
 bag = count.fit_transform(docs)
 
 
-# In[108]:
+# In[24]:
 
 
+'''
 def perplexity_by_ntopic(data, ntopics):
     output_dict = {
         "Number Of Topics": [],
@@ -294,31 +303,22 @@ def perplexity_by_ntopic(data, ntopics):
     ]
     return (output_df, output_num_topics)
 
-
-# In[109]:
-
-
 df_perplexity, optimal_num_topics = perplexity_by_ntopic(
     bag, ntopics=range(1,100)
 )
 print(df_perplexity)
 
-
-# In[110]:
-
+df_perplexity[:10]
 
 df_perplexity.sort_values(by=['Perplexity Score'], axis=0)
 print(df_perplexity['Perplexity Score'].min())
 print(df_perplexity['Perplexity Score'].idxmin())
 
-
-# In[111]:
-
-
 df_perplexity.plot.line("Number Of Topics",'Perplexity Score')
+'''
 
 
-# In[112]:
+# In[25]:
 
 
 """# 잠재 디리클레 할당을 사용한 토픽 모델링"""
@@ -332,7 +332,7 @@ lda = LatentDirichletAllocation(n_components = 5,
 X_topics = lda.fit_transform(bag)
 
 
-# In[113]:
+# In[26]:
 
 
 # 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (BoW 기반)
@@ -343,7 +343,22 @@ for topic_idx, topic in enumerate(lda.components_):
   print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
 
 
-# In[114]:
+# In[27]:
+
+
+f = open(path2+comment_file+'_en.txt', 'w')
+for topic_idx, topic in enumerate(lda.components_):
+    a="토픽 %d:" % (topic_idx+1)
+    f.write('\n'+a)
+    b=[]
+    for i in topic.argsort()[:-n_top_word - 1: -1]:
+        f.write(feature_name[i])
+        b.append(feature_name[i])    
+    
+f.close()
+
+
+# In[28]:
 
 
 pyLDAvis.enable_notebook()
@@ -351,27 +366,27 @@ vis = pyLDAvis.sklearn.prepare(lda, bag, count)
 pyLDAvis.display(vis)
 
 
-# In[115]:
+# In[29]:
 
 
-pyLDAvis.save_html(vis, path2+'lda.html')
+pyLDAvis.save_html(vis, path2+filename+'lda.html')
 
 
 # #  토크나이즈해서 dictionary 만든 후 작업, 즉 단어 1개씩
 
-# In[48]:
+# In[30]:
 
 
 # gamma, _ = lda.inference(corpus)
 
 
-# In[49]:
+# In[31]:
 
 
 en_sent[:10]
 
 
-# In[50]:
+# In[32]:
 
 
 model = LatentDirichletAllocation(n_components = 5,
@@ -381,32 +396,32 @@ model = LatentDirichletAllocation(n_components = 5,
 model.fit(bag) # model.fit_transform(X) is also available
 
 
-# In[51]:
+# In[33]:
 
 
-tokenized_doc = data_en.comment.apply(lambda x: x.split()) # 토큰화
+tokenized_doc = data_en['en_sent'].apply(lambda x: x.split()) # 토큰화
 
 
-# In[52]:
+# In[34]:
 
 
 tokenized_doc
 
 
-# In[92]:
+# In[35]:
 
 
 vectorizer = TfidfVectorizer(stop_words='english',
                         ngram_range=(3,6), # 유니그램 바이그램으로 사용
                         min_df = 3, # 3회 미만으로 등장하는 토큰은 무시
-                        max_df =0.95 # 많이 등장한 단어 5%의 토큰도 무시
+                        max_df =10000# 많이 등장한 단어 5%의 토큰도 무시
 )
 
 X = vectorizer.fit_transform(en_sent)
 X.shape # TF-IDF 행렬의 크기 확인
 
 
-# In[93]:
+# In[36]:
 
 
 svd_model = TruncatedSVD(n_components=5, algorithm='randomized', n_iter=100, random_state=122)
@@ -414,13 +429,13 @@ svd_model.fit(X)
 len(svd_model.components_)
 
 
-# In[94]:
+# In[37]:
 
 
 np.shape(svd_model.components_)
 
 
-# In[95]:
+# In[38]:
 
 
 # CountVectorizer객체내의 전체 word들의 명칭을 get_features_names( )를 통해 추출
@@ -433,7 +448,7 @@ def get_topics(components, feature_names, n=10):
 get_topics(svd_model.components_,terms)
 
 
-# In[96]:
+# In[39]:
 
 
 dictionary = corpora.Dictionary(tokenized_doc)
@@ -441,19 +456,19 @@ corpus = [dictionary.doc2bow(text) for text in tokenized_doc]
 print(corpus[1]) # 수행된 결과에서 두번째 뉴스 출력. 첫번째 문서의 인덱스는 0
 
 
-# In[97]:
+# In[40]:
 
 
 print(dictionary[12])
 
 
-# In[98]:
+# In[41]:
 
 
 len(dictionary)
 
 
-# In[99]:
+# In[42]:
 
 
 NUM_TOPICS = 5 #5개의 토픽, k=5
@@ -463,17 +478,15 @@ for topic in topics:
     print(topic)
 
 
-# In[100]:
+# In[43]:
 
 
-# import pyLDAvis.sklearn  # sklearn의 ldamodel에 최적화된 라이브러리
-
-# pyLDAvis.enable_notebook()
-# vis = pyLDAvis.sklearn.prepare(lda, corpus, terms)
-# pyLDAvis.display(vis)
+f = open(path2+comment_file+'en_2.txt', 'w')
+f.write(str(topics))
+f.close()
 
 
-# In[101]:
+# In[44]:
 
 
 pyLDAvis.enable_notebook()
@@ -481,19 +494,19 @@ vis2 = pyLDAvis.gensim_models.prepare(ldamodel, corpus, dictionary)
 pyLDAvis.display(vis2)
 
 
-# In[102]:
+# In[45]:
 
 
-pyLDAvis.save_html(vis2, path2+'lda_dic.html')
+pyLDAvis.save_html(vis2, path2+comment_file+'lda_dic.html')
 
 
-# In[65]:
+# In[46]:
 
 
 gamma, _ = ldamodel.inference(corpus)
 
 
-# In[67]:
+# In[47]:
 
 
 # 차원축소?
@@ -504,13 +517,7 @@ print('{} -> {}'.format(topic_vector.shape, y.shape))
 # (n_topics, n_terms) -> (n_topics, 2)
 
 
-# In[ ]:
-
-
-
-
-
-# In[68]:
+# In[48]:
 
 
 for i, topic_list in enumerate(ldamodel[corpus]):
@@ -519,7 +526,7 @@ for i, topic_list in enumerate(ldamodel[corpus]):
     print(i,'번째 문서의 topic 비율은',topic_list)
 
 
-# In[69]:
+# In[49]:
 
 
 def make_topictable_per_doc(ldamodel, corpus):
@@ -544,7 +551,7 @@ def make_topictable_per_doc(ldamodel, corpus):
     return(topic_table)
 
 
-# In[70]:
+# In[50]:
 
 
 topictable = make_topictable_per_doc(ldamodel, corpus)
@@ -553,33 +560,49 @@ topictable.columns = ['문서 번호', '가장 비중이 높은 토픽', '가장
 topictable[:10]
 
 
-# In[86]:
+# In[51]:
 
 
-# topic_word = model.components_ # model.components_also works
-# n_top_words = 5   # TOPIC으로 선정될 단어의 수
+topic_word = model.components_ # model.components_also works
+n_top_words = 5   # TOPIC으로 선정될 단어의 수
 
-# for i, topic_dist in enumerate(topic_word):
-#     topic_words = np.array(tokenized_doc)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
-#     print("Topic {}:{}".format(i, ' '.join(topic_words)))
 
-# dictionary = gensim.corpora.Dictionary(bag)
-# print('dictionary size : %d' % len(dictionary)) # dictionary size : ????
+# In[52]:
 
-# min_count = 10
-# word_counter = Counter((word for words in documents for word in words))
-# removal_word_idxs = {
-#     dictionary.token2id[word] for word, count in word_counter.items()
-#     if count < min_count
-# }
 
-# dictionary.filter_tokens(removal_word_idxs)
-# dictionary.compactify()
-# print('dictionary size : %d' % len(dictionary)) # dictionary size : 
+topic_word
 
-# lda_model = LdaModel(bag, id2word=dictionary, num_topics=6)
-# with open(lda_model_path, 'wb') as f:
-#     pickle.dump(lda_model, f)
+
+# In[53]:
+
+
+'''
+for i, topic_dist in enumerate(topic_word):
+    topic_words = np.array(tokenized_doc)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
+    print("Topic {}:{}".format(i, ' '.join(topic_words)))
+
+dictionary = gensim.corpora.Dictionary(bag)
+print('dictionary size : %d' % len(dictionary)) # dictionary size : ????
+
+min_count = 10
+word_counter = Counter((word for words in documents for word in words))
+removal_word_idxs = {
+    dictionary.token2id[word] for word, count in word_counter.items()
+    if count < min_count
+}
+
+dictionary.filter_tokens(removal_word_idxs)
+dictionary.compactify()
+print('dictionary size : %d' % len(dictionary)) # dictionary size : 
+
+lda_model = LdaModel(bag, id2word=dictionary, num_topics=6)
+with open(lda_model_path, 'wb') as f:
+    pickle.dump(lda_model, f)
+    '''
+
+
+# In[54]:
+
 
 def get_topic_term_prob(lda_model):
     topic_term_freqs = lda_model.state.get_lambda()
@@ -594,12 +617,6 @@ print(topic_term_prob.shape)     # (n_topics, n_terms)
 print(topic_term_prob[0].sum())  # 1.0
 
 
-# In[87]:
-
-
-
-
-
 # In[ ]:
 
 
@@ -612,50 +629,53 @@ print(topic_term_prob[0].sum())  # 1.0
 
 
 
-# In[116]:
+# In[ ]:
 
 
-# TF_IDF 벡터화
-
-tfidf = TfidfVectorizer(ngram_range=(3,6), # 유니그램 바이그램으로 사용
-                        min_df = 3, # 3회 미만으로 등장하는 토큰은 무시
-                        max_df =0.95 # 많이 등장한 단어 5%의 토큰도 무시
-                        )
-docs_tf = tfidf.fit_transform(docs)
 
 
-# In[68]:
-# LDA 사용 (tf-idf 기반)
-lda_tfidf = LatentDirichletAllocation(n_components = 6,
-                                      random_state = 1,
-                                      learning_method = 'batch')
 
-X_topics = lda_tfidf.fit_transform(docs_tf)
+# In[55]:
 
 
-# In[37]:
+# # TF_IDF 벡터화
+
+# tfidf = TfidfVectorizer(ngram_range=(3,6), # 유니그램 바이그램으로 사용
+#                         min_df = 3, # 3회 미만으로 등장하는 토큰은 무시
+#                         max_df =0.95 # 많이 등장한 단어 5%의 토큰도 무시
+#                         )
+# docs_tf = tfidf.fit_transform(docs)
 
 
-# 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (tf-idf 기반)
-n_top_word = 5
-feature_name = count.get_feature_names()
-for topic_idx, topic in enumerate(lda_tfidf.components_):
-  print("토픽 %d:" % (topic_idx+1))
-  print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
+# # In[68]:
+# # LDA 사용 (tf-idf 기반)
+# lda_tfidf = LatentDirichletAllocation(n_components = 6,
+#                                       random_state = 1,
+#                                       learning_method = 'batch')
+
+# X_topics = lda_tfidf.fit_transform(docs_tf)
+
+
+# # In[37]:
+
+
+# # 결과 분석을 위해 각 토픽 당 중요 단어 10개 출력 (tf-idf 기반)
+# n_top_word = 5
+# feature_name = count.get_feature_names()
+# for topic_idx, topic in enumerate(lda_tfidf.components_):
+#   print("토픽 %d:" % (topic_idx+1))
+#   print([feature_name[i] for i in topic.argsort()[:-n_top_word - 1: -1]])
 
 
 # # rake
 
-# In[ ]:
-
-
-# In[38]:
+# In[56]:
 
 
 get_ipython().system('pip install rake-nltk')
 
 
-# In[39]:
+# In[57]:
 
 
 from rake_nltk import Rake
@@ -666,18 +686,18 @@ from rake_nltk import Rake
 
 en_sent[:10]
 
+
+# In[58]:
+
+
 text=". ".join(en_sent)
-
-
-# In[40]:
-
 
 r=Rake()
 r.extract_keywords_from_text(text)
 r.get_ranked_phrases_with_scores()[:5]
 
 
-# In[72]:
+# In[59]:
 
 
 r1=Rake()
@@ -687,9 +707,10 @@ r1.get_ranked_phrases_with_scores()
 
 # # yake
 
-# In[ ]:
+# In[60]:
 
 
+'''
 # In[42]:
 
 
@@ -729,14 +750,12 @@ keywords = custom_kw_extractor.extract_keywords(a)
 
 for kw in keywords:
     print(kw)
+'''
 
 
 # # pke
 
-# In[ ]:
-
-
-# In[46]:
+# In[61]:
 
 
 get_ipython().system('pip install git+https://github.com/boudinfl/pke.git')
@@ -744,16 +763,13 @@ get_ipython().system('pip install spacy')
 get_ipython().system('python3 -m spacy download en')
 
 
-# In[47]:
+# In[62]:
 
 
+'''
 import pke
 import spacy
 # nlp = spacy.load("en_core_web_sm")
-
-
-# In[ ]:
-
 
 for i in range(len(en_sent)):
 
@@ -772,24 +788,17 @@ for i in range(len(en_sent)):
         keyphrase_score.extend((keyphrase, score))
         
 
-
-# In[ ]:
-
-
 keyphrase_score
-
-
-# In[ ]:
-
 
 with open('/home/lab10/final/key_score.txt', 'w') as f:
     for (keyphrase, score) in keyphrase_score:
         f.write((keyphrase, score))
+        '''
 
 
 # # k-means
 
-# In[126]:
+# In[63]:
 
 
 # Tf-idf 벡터화시키면서 cusotmized해준 토큰화+어근추출 방식 tokenizer인자에 넣어주기
@@ -811,7 +820,7 @@ data_en['label'] = cluster_label
 print(data_en.sort_values(by=['label']))
 
 
-# In[127]:
+# In[64]:
 
 
 # 문서의 feature(단어별) cluster_centers_확인해보자
@@ -821,7 +830,7 @@ print(cluster_centers)
 # shape의 행은 클러스터 레이블, 열은 벡터화 시킨 feature(단어들)
 
 
-# In[134]:
+# In[65]:
 
 
 def get_cluster_details(cluster_model, cluster_data, feature_names,
@@ -872,7 +881,7 @@ cluster_details = get_cluster_details(cluster_model=kmeans,
 print_cluster_details(cluster_details)
 
 
-# In[ ]:
+# In[66]:
 
 
 # In[56]:
@@ -905,7 +914,7 @@ similarity = cosine_similarity(ftr_vect[hotel_idx[0]], ftr_vect[hotel_idx])
 # print(similarity)
 
 
-# In[ ]:
+# In[67]:
 
 
 #  In[61]:
