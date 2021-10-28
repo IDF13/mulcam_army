@@ -43,7 +43,7 @@ plt.rc("font", family='Malgun Gothic')
 path = '/home/lab10/final/raw/'
 
 frames=[]
-comment_file = 'comments_트와이스.csv'  #세븐틴
+comment_file = 'stats_page_273방탄소년단.csv'  #세븐틴
 df = pd.read_csv(path+comment_file, encoding='utf-8', header=None)
 print(df)
 print('\n')
@@ -140,31 +140,31 @@ df.describe()
 # In[16]:
 
 
-df.info()
+df.fillna('None',inplace=True)
 
 
 # In[17]:
 
 
-df['like_num']=pd.to_numeric(df['like_num'])
+df.info()
 
 
 # In[18]:
 
 
-df['like_num'].describe(percentiles=[0.75,0.8,0.85,0.9,0.95,0.99,0.999,0.9999])
+df['like_num']=pd.to_numeric(df['like_num'])
 
 
 # In[19]:
 
 
-df['like_num'].plot()
+df['like_num'].describe(percentiles=[0.75,0.8,0.85,0.9,0.95,0.99,0.999,0.9999])
 
 
 # In[20]:
 
 
-df.fillna('None')
+df['like_num'].plot()
 
 
 # In[21]:
@@ -210,29 +210,41 @@ df['comment'] = df['comment'].str.lower()
 # In[25]:
 
 
-# 전처리 전 원본 보존
-copy_data = copy.deepcopy(df)
+df.isnull().sum()
 
 
 # In[26]:
 
 
-copy_data.info()
+# 전처리 전 원본 보존
+copy_data = copy.deepcopy(df)
 
 
 # In[27]:
 
 
-copy_data
+copy_data.info()
 
 
 # In[28]:
 
 
-type(copy_data['comment'].values[0])
+copy_data
 
 
 # In[29]:
+
+
+type(copy_data['comment'].values[0])
+
+
+# In[30]:
+
+
+copy_data.isnull().sum()
+
+
+# In[31]:
 
 
 emoji_pattern = re.compile("["
@@ -257,7 +269,7 @@ punct = "/-'?!.,#$%\'()*+-/:;<=>@[\\]^_`{|}~" + '""“”’' + '∞θ÷α•à�
 punct_mapping = {"‘": "'", "₹": "e", "´": "'", "°": "", "€": "e", "™": "tm", "√": " sqrt ", "×": "x", "²": "2", "—": "-", "–": "-", "’": "'", "_": "-", "`": "'", '“': '"', '”': '"', '“': '"', "£": "e", '∞': 'infinity', 'θ': 'theta', '÷': '/', 'α': 'alpha', '•': '.', 'à': 'a', '−': '-', 'β': 'beta', '∅': '', '³': '3', 'π': 'pi', }
 
 
-# In[30]:
+# In[32]:
 
 
 def clean_punc(text, punct, mapping):
@@ -278,7 +290,7 @@ for sent in comment_result:
     cleaned_corpus.append(clean_punc(sent, punct, punct_mapping))
 
 
-# In[31]:
+# In[33]:
 
 
 def clean_text(texts):
@@ -299,13 +311,13 @@ basic_preprocessed_corpus = clean_text(cleaned_corpus)
 comment_result = pd.DataFrame(basic_preprocessed_corpus, columns=["comment"])
 
 
-# In[32]:
+# In[34]:
 
 
 comment_result
 
 
-# In[33]:
+# In[35]:
 
 
 model = fasttext.load_model('/home/lab10/official_youtube/lid.176.ftz')
@@ -317,7 +329,7 @@ for t in comment_result.comment.values:
 ty = pd.DataFrame(predict)
 
 
-# In[34]:
+# In[36]:
 
 
 comment = []
@@ -349,7 +361,7 @@ pd.set_option('max_rows',100)
 # ty_sum.to_csv('ty_sum.csv', encoding='cp949')
 
 
-# In[35]:
+# In[37]:
 
 
 like = pd.DataFrame(copy_data['like_num'])
