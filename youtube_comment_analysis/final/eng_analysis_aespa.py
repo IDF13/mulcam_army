@@ -210,8 +210,9 @@ filename = comment_file
 # In[17]:
 
 
-youtube=np.array(Image.open('/home/lab10/final/pngwing.com (4).png'))
-wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5, mask=youtube).generate(noun_text) # generate() 는 하나의 string value를 입력 받음
+# youtube=np.array(Image.open('/home/lab10/final/pngwing.com (4).png'))
+# wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5, mask=youtube).generate(noun_text) # generate() 는 하나의 string value를 입력 받음
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(noun_text) # generate() 는 하나의 string value를 입력 받음
 plt.figure()
 plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis("off")
@@ -503,11 +504,8 @@ pyLDAvis.save_html(vis2, path2+comment_file+'lda_dic.html')
 # In[46]:
 
 
+'''
 gamma, _ = ldamodel.inference(corpus)
-
-
-# In[47]:
-
 
 # 차원축소?
 topic_vector = ldamodel.expElogbeta
@@ -516,18 +514,10 @@ y = PCA(n_components=2).fit_transform(topic_vector)
 print('{} -> {}'.format(topic_vector.shape, y.shape))
 # (n_topics, n_terms) -> (n_topics, 2)
 
-
-# In[48]:
-
-
 for i, topic_list in enumerate(ldamodel[corpus]):
     if i==5:
         break
     print(i,'번째 문서의 topic 비율은',topic_list)
-
-
-# In[49]:
-
 
 def make_topictable_per_doc(ldamodel, corpus):
     topic_table = pd.DataFrame()
@@ -550,30 +540,19 @@ def make_topictable_per_doc(ldamodel, corpus):
                 break
     return(topic_table)
 
-
-# In[50]:
-
-
 topictable = make_topictable_per_doc(ldamodel, corpus)
 topictable = topictable.reset_index() # 문서 번호을 의미하는 열(column)로 사용하기 위해서 인덱스 열을 하나 더 만든다.
 topictable.columns = ['문서 번호', '가장 비중이 높은 토픽', '가장 높은 토픽의 비중', '각 토픽의 비중']
 topictable[:10]
 
-
-# In[51]:
-
-
 topic_word = model.components_ # model.components_also works
 n_top_words = 5   # TOPIC으로 선정될 단어의 수
 
-
-# In[52]:
-
-
 topic_word
+'''
 
 
-# In[53]:
+# In[47]:
 
 
 '''
@@ -601,9 +580,10 @@ with open(lda_model_path, 'wb') as f:
     '''
 
 
-# In[54]:
+# In[48]:
 
 
+'''
 def get_topic_term_prob(lda_model):
     topic_term_freqs = lda_model.state.get_lambda()
     topic_term_prob = topic_term_freqs / topic_term_freqs.sum(axis=1)[:, None]
@@ -615,6 +595,7 @@ print(ldamodel.alpha.sum()) # 1.0
 topic_term_prob = get_topic_term_prob(ldamodel)
 print(topic_term_prob.shape)     # (n_topics, n_terms)
 print(topic_term_prob[0].sum())  # 1.0
+'''
 
 
 # In[ ]:
@@ -635,7 +616,7 @@ print(topic_term_prob[0].sum())  # 1.0
 
 
 
-# In[55]:
+# In[49]:
 
 
 # # TF_IDF 벡터화
@@ -669,13 +650,10 @@ print(topic_term_prob[0].sum())  # 1.0
 
 # # rake
 
-# In[56]:
+# In[50]:
 
 
-get_ipython().system('pip install rake-nltk')
-
-
-# In[57]:
+'''get_ipython().system('pip install rake-nltk')
 
 
 from rake_nltk import Rake
@@ -686,28 +664,21 @@ from rake_nltk import Rake
 
 en_sent[:10]
 
-
-# In[58]:
-
-
 text=". ".join(en_sent)
 
 r=Rake()
 r.extract_keywords_from_text(text)
 r.get_ranked_phrases_with_scores()[:5]
 
-
-# In[59]:
-
-
 r1=Rake()
 r1.extract_keywords_from_sentences(en_sent[:10])
 r1.get_ranked_phrases_with_scores()
+'''
 
 
 # # yake
 
-# In[60]:
+# In[51]:
 
 
 '''
@@ -755,15 +726,16 @@ for kw in keywords:
 
 # # pke
 
-# In[61]:
+# In[52]:
 
 
-get_ipython().system('pip install git+https://github.com/boudinfl/pke.git')
+'''get_ipython().system('pip install git+https://github.com/boudinfl/pke.git')
 get_ipython().system('pip install spacy')
 get_ipython().system('python3 -m spacy download en')
+'''
 
 
-# In[62]:
+# In[53]:
 
 
 '''
@@ -798,12 +770,126 @@ with open('/home/lab10/final/key_score.txt', 'w') as f:
 
 # # k-means
 
+# ## 상위 10% 댓글 
+
+# In[54]:
+
+
+data.like.describe(percentiles=[0.9])
+                # 좋아요 갯수 일정갯수 이상 만 
+
+
+# In[55]:
+
+
+# idx=data[data['like']<=185].index              #좋아요 갯수 상위 15000 정도 이상 댓글만 남김
+# data.drop(idx, inplace=True)
+
+data_2 = data[data.like >=185]
+len(data_2)
+
+
+# In[56]:
+
+
+data_ko = pd.DataFrame([kor[:1] for kor in data_2.values if kor[2] == '(ko)'], columns=['comment'])
+data_en = pd.DataFrame([en[:1] for en in data_2.values if en[2] == '(en)'], columns=['comment'])
+data_en.comment.values
+
+
+# In[57]:
+
+
+for i in range(len(data_en.comment)):
+    data_en.comment[i] = str(data_en.comment[i])
+
+
+# In[58]:
+
+
+# 숫자제거 / 밑줄 제외한 특수문자 제거
+p = re.compile("[0-2]+")
+z = re.compile("[3-9]+")
+q = re.compile("\W+")
+r = re.compile('[^a-zA-Z]+')
+
+en = []
+for i in data_en.comment.values:
+    tokens = re.sub(p," ",i)
+    tokens = re.sub(z," ",tokens)
+    tokens = re.sub(q," ",tokens)
+    tokens = re.sub(r," ", tokens)
+    en.append(tokens)
+len(en)
+
+
+# In[59]:
+
+
+stop_words = set(stopwords.words('english')) 
+# stop_words.update(('song','group','songs','youtube','views','time','https','girl','girls','people','yes','lol','video','part','member','members', 'look','way','guys','fans','fan'))
+# stop
+
+res=[]
+for i in range(len(en)):
+    word_tokens = word_tokenize(en[i])
+
+    result = []
+    for w in word_tokens: 
+        if w not in stop_words: 
+            result.append(w) 
+    res.append(result)
+
+# print(word_tokens) 
+print(res[:10])
+print(len(res))
+
+
+# In[60]:
+
+
+## 3단어 이하 짧은 단어 제거
+ # remove words less than three letters
+# print(res[1])
+# for word in res[1]:
+#     print(word)
+en_sent_less3=[]
+for i in range(len(res)):
+    tokens = [word for word in res[i] if len(word) >= 3]
+    en_sent_less3.append(tokens)
+en_sent_less3[:2]
+
+
+# In[61]:
+
+
+en_sent =[]
+for i in range(len(en_sent_less3)):
+    temp=" ".join(en_sent_less3[i])
+    en_sent.append(temp)
+en_sent[:15]
+
+
+# In[62]:
+
+
+data_en['en_sent']=en_sent
+
+
 # In[63]:
+
+
+data_en.tail()
+
+
+# ## 상위 10% k-means 클러스터링
+
+# In[64]:
 
 
 # Tf-idf 벡터화시키면서 cusotmized해준 토큰화+어근추출 방식 tokenizer인자에 넣어주기
 # 벡터화시킬 Tf-idf 도구 옵션 추가해서 구축
-# 3,6gram적용, 빈도수 0.05이하, 0.85이상의 빈도수 단어들 제거
+# 1,3gram적용, 빈도수 0.05이하, 0.95이상의 빈도수 단어들 제거
 tfidf_vect = TfidfVectorizer(ngram_range=(1,3),
                             min_df=0.05, max_df=0.95)
 # fit_transform으로 위에서 구축한 도구로 텍스트 벡터화
@@ -820,7 +906,7 @@ data_en['label'] = cluster_label
 print(data_en.sort_values(by=['label']))
 
 
-# In[64]:
+# In[65]:
 
 
 # 문서의 feature(단어별) cluster_centers_확인해보자
@@ -830,7 +916,7 @@ print(cluster_centers)
 # shape의 행은 클러스터 레이블, 열은 벡터화 시킨 feature(단어들)
 
 
-# In[65]:
+# In[66]:
 
 
 def get_cluster_details(cluster_model, cluster_data, feature_names,
@@ -881,24 +967,749 @@ cluster_details = get_cluster_details(cluster_model=kmeans,
 print_cluster_details(cluster_details)
 
 
-# In[66]:
+# # 명사 추출 
+# 
+# ## 댓글 군집화 / 자주 나온 / 댓글 군집한 것을 가지고 군집별 
+# 
+# ### 해당 아티스트 이름 제거
+# ### word to bag 
+# ### 군집별 워드클라우드
+# ### 공감지수 기반 상위 10% 가지고 똑같은 수행
+# 
+# 
+
+# In[67]:
 
 
-# In[56]:
+data_en.tail()
 
 
+# In[68]:
+
+
+en_pos = []
+for i in range(len(res)):
+    tokens_pos = nltk.pos_tag(res[i])
+    en_pos.append(tokens_pos)
+
+
+# In[69]:
+
+
+# 명사는 NN을 포함하고 있음을 알 수 있음
+en_NN=[]
+for i in range(len(en_pos)):
+    NN_words = []
+    for word, pos in en_pos[i]:
+        if 'NN' in pos:
+            NN_words.append(word)
+        elif 'NNS' in pos:
+            NN_words.append(word)
+    en_NN.append(NN_words)
+en_NN[:10]
+
+
+# In[70]:
+
+
+data_en['en_sent']=en_NN
+
+
+# In[71]:
+
+
+for i in range(len(data_en.en_sent)):
+    data_en.en_sent[i]=' '.join(data_en.en_sent[i])
+
+
+# In[72]:
+
+
+data_en
+
+
+# In[73]:
+
+
+data_en['en_sent'].str.contains('aespa').value_counts()
+
+
+# In[74]:
+
+
+df=data_en.copy()
+
+
+# In[75]:
+
+
+df.drop(['comment'],axis=1,inplace=True)
+
+
+# In[76]:
+
+
+for i in range(len(df.en_sent)):
+    df.en_sent[i] = str(df.en_sent[i])
+
+
+# In[77]:
+
+
+# 숫자제거 / 밑줄 제외한 특수문자 제거
+p = re.compile("aespa")
+
+en1 = []
+for i in df.en_sent.values:
+    tokens = re.sub(p," ",i)
+    en1.append(tokens)
+len(en1)
+
+
+# In[78]:
+
+
+df['en_sent']=en1
+
+
+# In[79]:
+
+
+df['en_sent'].str.contains('aespa').value_counts()
+
+
+# ### BoW 
+
+# In[80]:
+
+
+# BoW 모델로 벡터화
+count = CountVectorizer(ngram_range=(1,3),
+                        max_df = 0.05,
+                        max_features=5, stop_words='english')
+docs2 = df.en_sent
+bag2 = count.fit_transform(docs2)
+
+
+# In[81]:
+
+
+kmeans = KMeans(n_clusters=5, max_iter=10000, random_state=42)
+# 비지도 학습이니 feature로만 학습시키고 예측
+cluster_label = kmeans.fit_predict(bag2)
+
+# 군집화한 레이블값들을 document_df 에 추가하기
+df['label'] = cluster_label
+print(df.sort_values(by=['label']))
+
+
+# In[82]:
+
+
+# 문서의 feature(단어별) cluster_centers_확인해보자
+cluster_centers = kmeans.cluster_centers_
+print(cluster_centers.shape)
+print(cluster_centers)
+# shape의 행은 클러스터 레이블, 열은 벡터화 시킨 feature(단어들)
+
+
+# In[83]:
+
+
+def get_cluster_details(cluster_model, cluster_data, feature_names,
+                       cluster_num, top_n_features):
+    cluster_details = {}
+    # 각 클러스터 레이블별 feature들의 center값들 내림차순으로 정렬 후의 인덱스를 반환
+    center_feature_idx = cluster_model.cluster_centers_.argsort()[:,::-1]
+    
+    # 개별 클러스터 레이블별로 
+    for cluster_num in range(cluster_num):
+        # 개별 클러스터별 정보를 담을 empty dict할당
+        cluster_details[cluster_num] = {}
+        cluster_details[cluster_num]['cluster'] = cluster_num
+        
+        # 각 feature별 center값들 정렬한 인덱스 중 상위 5개만 추출
+        top_ftr_idx = center_feature_idx[cluster_num, :top_n_features]
+        top_ftr = [feature_names[idx] for idx in top_ftr_idx]
+        # top_ftr_idx를 활용해서 상위 1개 feature들의 center값들 반환
+        # 반환하게 되면 array이기 떄문에 리스트로바꾸기
+        top_ftr_val = cluster_model.cluster_centers_[cluster_num, top_ftr_idx].tolist()
+        
+        # cluster_details 딕셔너리에다가 개별 군집 정보 넣어주기
+        cluster_details[cluster_num]['top_features'] = top_ftr
+        cluster_details[cluster_num]['top_featrues_value'] = top_ftr_val
+        # 해당 cluster_num으로 분류된 파일명(문서들) 넣어주기
+        comment = cluster_data[cluster_data['label']==cluster_num]['en_sent']
+        # filenames가 df으로 반환되기 떄문에 값들만 출력해서 array->list로 변환
+        comment = comment.values.tolist()
+        cluster_details[cluster_num]['en_sent'] = comment
+    
+    return cluster_details
+
+def print_cluster_details(cluster_details):
+    for cluster_num, cluster_detail in cluster_details.items():
+        print(f"#####Cluster Num: {cluster_num}")
+        print()
+        print(f"상위 1개 feature단어들:\n", cluster_detail['top_features'])
+        print()
+        print(f"Cluster {cluster_num}으로 분류된 문서들:\n{cluster_detail['en_sent'][:10]}")
+        print('-'*20)
+
+feature_names = count.get_feature_names()
+
+
+# In[84]:
+
+
+cluster_details = get_cluster_details(cluster_model=kmeans,
+                                     cluster_data=df,
+                                     feature_names=feature_names,
+                                     cluster_num=5,
+                                     top_n_features=5)
+
+
+# In[85]:
+
+
+cluster_details[0]
+
+
+# In[86]:
+
+
+print_cluster_details(cluster_details)
+
+
+# In[ ]:
+
+
+
+
+
+# ## 그룹별 워드클라우드
+
+# In[87]:
+
+
+a=" ".join(cluster_details[0]['en_sent'])
+
+
+# In[88]:
+
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(a) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[89]:
+
+
+b=" ".join(cluster_details[1]['en_sent'])
+
+
+# In[90]:
+
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(b) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[91]:
+
+
+c=" ".join(cluster_details[2]['en_sent'])
+
+
+# In[92]:
+
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(c) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[93]:
+
+
+d=" ".join(cluster_details[3]['en_sent'])
+
+
+# In[94]:
+
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(d) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[95]:
+
+
+e=" ".join(cluster_details[4]['en_sent'])
+
+
+# In[96]:
+
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(e) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[ ]:
+
+
+
+
+
+# In[97]:
+
+
+get_ipython().system('pip install textblob')
+
+
+# In[98]:
+
+
+data
+
+
+# In[99]:
+
+
+data_ko = pd.DataFrame([kor[:2] for kor in data.values if kor[2] == '(ko)'], columns=['comment','like'])
+data_en = pd.DataFrame([en[:2] for en in data.values if en[2] == '(en)'], columns=['comment','like'])
+data_en.comment.values
+
+
+# In[100]:
+
+
+data_en.dropna()
+
+
+# In[101]:
+
+
+data_en.info()
+
+
+# In[102]:
+
+
+data_en.fillna("None",inplace=True)
+
+
+# In[103]:
+
+
+data_en.info()
+
+
+# In[104]:
+
+
+import pandas as pd
+from textblob import TextBlob
+
+# 여기만 바꿔주시면 됩니다!
+texts = data_en.iloc[:, 0]
+likes = data_en.iloc[:, 1]
+
+
+# In[138]:
+
+
+clean_tweets = []
+scores = []
+likes_list = []
+emotions = []
+lang=data['lang']
+
+likes = likes.fillna(0)
+value_list = likes.values.tolist()
+value_list = [str(value) for value in value_list]
+
+
+def sentiment_analyzer():
+    for tweet in texts:
+        clean_tweets.append(tweet)
+        blob = TextBlob(tweet)
+        score = round(blob.sentiment.polarity, 2)
+        scores.append(score)
+
+    # for like in likes:
+    #     likes_list.append(like)
+
+    for value in value_list:
+        result = 0
+        num_map = {'천': 1000, '만': 10000}
+        if value.isdigit():
+            result = int(value)
+        else:
+            if len(value) > 1:
+                result = float(value[:-1])*num_map.get(value[-1].upper(), 1)
+        likes_list.append(int(result))
+
+    for score, like in zip(scores, likes_list):
+        emotions.append(round(score*like, 2))
+
+    table = pd.DataFrame(
+        [clean_tweets, likes_list, scores, emotions, lang]).T
+    table.columns = ['original texts', '👍 좋아요',
+                     '⭐️ 긍정점수(textblob)', '😍 공감지수(좋아요 수 x 긍정점수)','lang']
+
+    print(table)
+
+    table.to_csv(f'/home/lab10/final/'+filename+'_table.csv')
+    return table
+
+
+# In[139]:
+
+
+sentiment_analyzer()
+
+
+# In[140]:
+
+
+df2=pd.read_csv(f'/home/lab10/final/'+filename+'_table.csv')
+
+
+# In[141]:
+
+
+df2.sort_values(by=['😍 공감지수(좋아요 수 x 긍정점수)'], axis=0,ascending=False)
+
+
+# In[142]:
+
+
+df2['😍 공감지수(좋아요 수 x 긍정점수)'].describe(percentiles=[0.9])
+                # 좋아요 갯수 일정갯수 이상 만 
+
+
+# In[143]:
+
+
+# idx=data[df2['😍 공감지수(좋아요 수 x 긍정점수)']<10].index              #좋아요 갯수 상위 15000 정도 이상 댓글만 남김
+# df2.drop(idx, inplace=True)
+
+df3 = df2[df2['😍 공감지수(좋아요 수 x 긍정점수)'] >= 5]
+len(df3)
+
+
+# In[144]:
+
+
+df3
+
+
+# In[145]:
+
+
+df3.drop(['Unnamed: 0'],axis=1,inplace=True)
+
+
+# In[146]:
+
+
+df3
+
+
+# In[147]:
+
+
+data_ko = pd.DataFrame([kor[:1] for kor in df3.values if kor[4] == '(ko)'], columns=['original texts'])
+data_en2 = pd.DataFrame([en[:1] for en in df3.values if en[4] == '(en)'], columns=['original texts'])
+data_en2['original texts'].values
+
+
+# In[148]:
+
+
+for i in range(len(data_en2['original texts'])):
+    data_en2['original texts'][i] = str(data_en2['original texts'][i])
+
+
+# In[149]:
+
+
+# 숫자제거 / 밑줄 제외한 특수문자 제거
+p = re.compile("[0-2]+")
+z = re.compile("[3-9]+")
+q = re.compile("\W+")
+r = re.compile('[^a-zA-Z]+')
+
+en = []
+for i in data_en2['original texts'].values:
+    tokens = re.sub(p," ",i)
+    tokens = re.sub(z," ",tokens)
+    tokens = re.sub(q," ",tokens)
+    tokens = re.sub(r," ", tokens)
+    en.append(tokens)
+len(en)
+
+
+# In[150]:
+
+
+stop_words = set(stopwords.words('english')) 
+stop_words.update(('aespa','aespa'))
+# stop
+
+res=[]
+for i in range(len(en)):
+    word_tokens = word_tokenize(en[i])
+
+    result = []
+    for w in word_tokens: 
+        if w not in stop_words: 
+            result.append(w) 
+    res.append(result)
+
+# print(word_tokens) 
+print(res[:10])
+print(len(res))
+
+
+# In[151]:
+
+
+en_sent_less3=[]
+for i in range(len(res)):
+    tokens = [word for word in res[i] if len(word) >= 3]
+    en_sent_less3.append(tokens)
+en_sent_less3[:2]
+
+
+# In[152]:
+
+
+en_sent =[]
+for i in range(len(en_sent_less3)):
+    temp=" ".join(en_sent_less3[i])
+    en_sent.append(temp)
+en_sent[:15]
+
+
+# In[153]:
+
+
+data_en2['en_sent']=en_sent
+
+
+# In[154]:
+
+
+len(data_en2)
+
+
+# In[155]:
+
+
+data_en2.tail()
+
+
+# In[156]:
+
+
+# BoW 모델로 벡터화
+count = CountVectorizer(ngram_range=(1,3),
+                        max_df = 0.05,
+                        max_features=5, stop_words='english')
+docs3 = data_en2.en_sent
+bag3 = count.fit_transform(docs3)
+
+
+# In[157]:
+
+
+kmeans = KMeans(n_clusters=5, max_iter=10000, random_state=42)
+# 비지도 학습이니 feature로만 학습시키고 예측
+cluster_label = kmeans.fit_predict(bag3)
+
+# 군집화한 레이블값들을 document_df 에 추가하기
+data_en2['label'] = cluster_label
+print(data_en2.sort_values(by=['label']))
+
+
+# In[158]:
+
+
+# 문서의 feature(단어별) cluster_centers_확인해보자
+cluster_centers = kmeans.cluster_centers_
+print(cluster_centers.shape)
+print(cluster_centers)
+# shape의 행은 클러스터 레이블, 열은 벡터화 시킨 feature(단어들)
+
+
+# In[168]:
+
+
+def get_cluster_details(cluster_model, cluster_data, feature_names,
+                       cluster_num, top_n_features):
+    cluster_details = {}
+    # 각 클러스터 레이블별 feature들의 center값들 내림차순으로 정렬 후의 인덱스를 반환
+    center_feature_idx = cluster_model.cluster_centers_.argsort()[:,::-1]
+    
+    # 개별 클러스터 레이블별로 
+    for cluster_num in range(cluster_num):
+        # 개별 클러스터별 정보를 담을 empty dict할당
+        cluster_details[cluster_num] = {}
+        cluster_details[cluster_num]['cluster'] = cluster_num
+        
+        # 각 feature별 center값들 정렬한 인덱스 중 상위 5개만 추출
+        top_ftr_idx = center_feature_idx[cluster_num, :top_n_features]
+        top_ftr = [feature_names[idx] for idx in top_ftr_idx]
+        # top_ftr_idx를 활용해서 상위 1개 feature들의 center값들 반환
+        # 반환하게 되면 array이기 떄문에 리스트로바꾸기
+        top_ftr_val = cluster_model.cluster_centers_[cluster_num, top_ftr_idx].tolist()
+        
+        # cluster_details 딕셔너리에다가 개별 군집 정보 넣어주기
+        cluster_details[cluster_num]['top_features'] = top_ftr
+        cluster_details[cluster_num]['top_featrues_value'] = top_ftr_val
+        # 해당 cluster_num으로 분류된 파일명(문서들) 넣어주기
+        comment = cluster_data[cluster_data['label']==cluster_num]['en_sent']
+        # filenames가 df으로 반환되기 떄문에 값들만 출력해서 array->list로 변환
+        comment = comment.values.tolist()
+        cluster_details[cluster_num]['en_sent'] = comment
+    
+    return cluster_details
+
+def print_cluster_details(cluster_details):
+    for cluster_num, cluster_detail in cluster_details.items():
+        print(f"#####Cluster Num: {cluster_num}")
+        print()
+        print(f"상위 1개 feature단어들:\n", cluster_detail['top_features'])
+        print()
+        print(f"Cluster {cluster_num}으로 분류된 문서들:\n{cluster_detail['en_sent'][:10]}")
+        print('-'*20)
+
+feature_names = count.get_feature_names()
+
+
+# In[169]:
+
+
+cluster_details2 = get_cluster_details(cluster_model=kmeans,
+                                     cluster_data=data_en2,
+                                     feature_names=feature_names,
+                                     cluster_num=5,
+                                     top_n_features=5)
+
+
+# In[170]:
+
+
+cluster_details2[0]
+
+
+# In[171]:
+
+
+print_cluster_details(cluster_details2)
+
+
+# In[172]:
+
+
+a=" ".join(cluster_details2[0]['en_sent'])
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(a) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[173]:
+
+
+b=" ".join(cluster_details2[1]['en_sent'])
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(b) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[174]:
+
+
+c=" ".join(cluster_details2[2]['en_sent'])
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(c) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[175]:
+
+
+d=" ".join(cluster_details2[3]['en_sent'])
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(d) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[176]:
+
+
+e=" ".join(cluster_details2[4]['en_sent'])
+
+wordcloud = WordCloud(font_path='font/NanumGothic.ttf', background_color='black', colormap='YlOrRd', relative_scaling=.5).generate(e) # generate() 는 하나의 string value를 입력 받음
+plt.figure()
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[135]:
+
+
+'''
 data_en.head()
-
-
-# In[57]:
-
 
 # 클러스터링된 문서들 중에서 특정 문서를 하나 선택한 후 비슷한 문서 추출
 from sklearn.metrics.pairwise import cosine_similarity
-
-
-# In[59]:
-
 
 hotel_idx = data_en[data_en['label']==1].index
 print("호텔 카테고리로 클러스터링된 문서들의 인덱스:\n",hotel_idx)
@@ -912,13 +1723,13 @@ print()
 # 다른 문서들과의 유사도 측정
 similarity = cosine_similarity(ftr_vect[hotel_idx[0]], ftr_vect[hotel_idx])
 # print(similarity)
+'''
 
 
-# In[67]:
+# In[136]:
 
 
-#  In[61]:
-
+'''
 
 # 비교기준 문서와 다른 문서들간의 유사도 살펴보기
 import seaborn as sns
@@ -1072,9 +1883,11 @@ def textrank_keysentence(sents, tokenize, min_count, similarity, df=0.85, max_it
     idxs = R.argsort()[-topk:]
     keysents = [(idx, R[idx], sents[idx]) for idx in reversed(idxs)]
     return keysents
+'''
 
 
 # In[ ]:
+
 
 
 
